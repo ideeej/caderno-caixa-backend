@@ -1,5 +1,5 @@
 import { User } from "src/modules/user/entities/User";
-import { User as PrismaUser } from '@prisma/client';
+import { Prisma, User as PrismaUser } from '@prisma/client';
 
 export class PrismaUserMapper {
     static toPrismaUser({createdAt, name, email, password, id}: User): PrismaUser {
@@ -10,5 +10,14 @@ export class PrismaUserMapper {
             email,
             password
         }
+    }
+
+    static toDomain({createdAt, name, email, password, id}:PrismaUser):User {
+        return new User({
+            createdAt,
+            name,
+            email,
+            password
+        }, id)
     }
 }
