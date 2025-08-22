@@ -9,9 +9,27 @@ datasource db {
 
 model User {
   @@map("users")
+
   id String @id
   name String
   email String @unique
   password String
   createdAt DateTime
+  cashRegister CashRegister[]
+}
+
+model CashRegister {
+  @@map("CashRegisters")
+
+  id String @id
+
+  userId String
+  user User @relation(fields: [userId], references: [id])
+
+  openedAt DateTime  @default(now())
+  closedAt DateTime? 
+  initialAmount Int
+  closingAmount Int?
+  isOpen Boolean
+
 }
