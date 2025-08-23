@@ -1,66 +1,75 @@
-import { randomUUID } from "crypto"
-import { Replace } from "src/utils/replace"
+import { randomUUID } from 'crypto'
+import { Replace } from 'src/utils/replace'
 
 interface CashRegisterProps {
-    userId: string
-    openedAt: Date
-    closedAt: Date | null
-    initialAmount: Number
-    closingAmount: Number | null
-    isOpen: Boolean
-
+  userId: string
+  openedAt: Date
+  closedAt?: Date | null
+  initialAmount: Number
+  closingAmount?: Number | null
+  isOpen: Boolean
 }
 
 export class CashRegister {
-    private props: CashRegisterProps
-    private _id: string
+  private props: CashRegisterProps
+  private _id: string
 
-    constructor(props: Replace<CashRegisterProps, {closedAt?: Date, closingAmount?: Number}>, id?:string) {
-        this.props = {
-            ...props,
-            closedAt: props.closedAt ?? null,
-            closingAmount: props.closingAmount ?? null
-        }
-
-        this._id = id || randomUUID();
-    }
-    get id(): string {
-        return this._id
-    }
-
-    get openedAt(): Date {
-        return this.props.openedAt
+  constructor(
+    props: Replace<
+      CashRegisterProps,
+      { closedAt?: Date | null; closingAmount?: Number | null }
+    >,
+    id?: string
+  ) {
+    this.props = {
+      ...props,
+      closedAt: props.closedAt ?? null,
+      closingAmount: props.closingAmount ?? null,
     }
 
-    get closedAt(): Date | null {
-        return this.props.closedAt
-    }
+    this._id = id || randomUUID()
+  }
+  get id(): string {
+    return this._id
+  }
 
-    set closedAt(closedAtDate: Date) {
-        this.props.closedAt = closedAtDate
-    }
+  get userId(): string {
+    return this.props.userId
+  }
 
-    get initialAmount(): Number {
-        return this.props.initialAmount
-    }
+  get openedAt(): Date {
+    return this.props.openedAt
+  }
 
-    set initialAmount(initialAmount: Number) {
-        this.props.initialAmount = initialAmount
-    }
+  get closedAt(): Date | null | undefined {
+    return this.props.closedAt
+  }
 
-    get closingAmount(): Number | null {
-        return this.props.closingAmount
-    }
+  set closedAt(closedAtDate: Date) {
+    this.props.closedAt = closedAtDate
+  }
 
-    set closingAmount(closingAmount: Number) {
-        this.props.closingAmount = closingAmount
-    }
+  get initialAmount(): Number {
+    return this.props.initialAmount
+  }
 
-    get isOpen(): Boolean {
-        return this.props.isOpen
-    }
+  set initialAmount(initialAmount: Number) {
+    this.props.initialAmount = initialAmount
+  }
 
-    set isOpen(isOpen: Boolean) {
-        this.props.isOpen = isOpen
-    }
+  get closingAmount(): Number | null | undefined {
+    return this.props.closingAmount
+  }
+
+  set closingAmount(closingAmount: Number) {
+    this.props.closingAmount = closingAmount
+  }
+
+  get isOpen(): Boolean {
+    return this.props.isOpen
+  }
+
+  set isOpen(isOpen: Boolean) {
+    this.props.isOpen = isOpen
+  }
 }

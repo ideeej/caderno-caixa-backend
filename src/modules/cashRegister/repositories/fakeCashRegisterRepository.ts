@@ -1,34 +1,55 @@
-import { CashRegister } from "../entities/CashRegister";
-import { CashRegisterRepository } from "./cashRegisterRepository";
+import { CloseCashRegisterDTO } from '../dtos/closeCashRegisterDTO'
+import { OpenCashRegisterDTO } from '../dtos/openCashRegisterDTO'
+import { CashRegister } from '../entities/CashRegister'
+import { makeCashRegister } from '../factories/registerFactory'
+import { CashRegisterRepository } from './cashRegisterRepository'
 
 export class FakeCashRegisterRepository implements CashRegisterRepository {
-    public cashRegisters: CashRegister[] = [];
+  public cashRegisters: CashRegister[] = []
 
-    async open(cashRegister: CashRegister): Promise<CashRegister | null> {
-        const result = this.cashRegisters.push(cashRegister);
-        return new Promise((resolve, reject) => {
-            
-            if(result === 1) {
-                resolve(cashRegister)
-            }
-             else {
-                reject(null)
-             }
-            
-        })
+  async openRegister({
+    initialAmount,
+    userId,
+  }: OpenCashRegisterDTO): Promise<CashRegister | null> {
+    const cashRegister = makeCashRegister({ initialAmount, userId })
+    this.cashRegisters.push(cashRegister)
+
+    return cashRegister ?? null
+  }
+
+  async closeRegister({
+    closingAmount,
+    userId,
+  }: CloseCashRegisterDTO): Promise<void> {
+    const cashRegister = this.cashRegisters.find(
+      register => register.userId === userId && register.isOpen
+    )
+
+    if (cashRegister) {
+      cashRegister.closedAt = new Date()
+      cashRegister.isOpen = false
+      cashRegister.closingAmount = closingAmount
     }
+  }
 
-    async close (cashRegister: CashRegister): Promise<CashRegister | null> {
-        return new Promise((resolve, reject) => {
-            const registerIndexToClose = this.cashRegisters.findIndex(register => (register.id === cashRegister.id))
-            if(this.cashRegisters[registerIndexToClose]) {
-                this.cashRegisters.splice(registerIndexToClose, 1);
-                resolve(cashRegister)
-            } else {
-                reject(null)
-            }
-        })
+  async findRegisterById(cashRegisterId: string): Promise<CashRegister | null> {
+    return (
+      this.cashRegisters.find(register => register.id === cashRegisterId) ??
+      null
+    )
+  }
 
-    }
+  async findOpenRegister(userId: string): Promise<CashRegister | null> {
+    return (
+      this.cashRegisters.find(
+        register => register.userId === userId && register.isOpen
+      ) ?? null
+    )
+  }
 
+  async findUserRegisters(userId: string): Promise<CashRegister[] | null> {
+    return (
+      this.cashRegisters.filter(register => register.userId === userId) ?? null
+    )
+  }
 }
