@@ -6,8 +6,16 @@ export class FakeCashRegisterRepository implements CashRegisterRepository {
   public cashRegisters: CashRegister[] = []
 
   async save(cashRegister: CashRegister): Promise<CashRegister> {
-    const registers = this.cashRegisters.push(cashRegister)
-    return this.cashRegisters[registers - 1]
+    const existingIndex = this.cashRegisters.findIndex(
+      r => r.id === cashRegister.id
+    )
+    if (existingIndex !== -1) {
+      this.cashRegisters[existingIndex] = cashRegister
+      return this.cashRegisters[existingIndex]
+    } else {
+      const registers = this.cashRegisters.push(cashRegister)
+      return this.cashRegisters[registers - 1]
+    }
   }
 
   async close(amount: number, operatorId: string): Promise<void> {
@@ -16,14 +24,6 @@ export class FakeCashRegisterRepository implements CashRegisterRepository {
     if (cashRegister) {
       cashRegister.close(amount)
     }
-  }
-
-  async deposit({ amount, type }: Transaction): Promise<void> {
-    throw new Error('Method not implemented.')
-  }
-
-  async cashOut({ amount, type }: Transaction): Promise<void> {
-    throw new Error('Method not implemented.')
   }
 
   async findActiveRegister(operatorId: string): Promise<CashRegister | null> {
