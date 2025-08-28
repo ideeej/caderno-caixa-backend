@@ -5,4 +5,7 @@ export abstract class CashRegisterRepository {
   abstract save(cashRegister: CashRegister): Promise<CashRegister>
   abstract close(amount: number, operatorId: string): Promise<void>
   abstract findActiveRegister(operatorId: string): Promise<CashRegister | null>
+  abstract findRegisterById(
+    cashRegisterId: string
+  ): Promise<CashRegister | null>
 }

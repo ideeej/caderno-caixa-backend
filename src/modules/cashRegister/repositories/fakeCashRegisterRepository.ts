@@ -33,4 +33,8 @@ export class FakeCashRegisterRepository implements CashRegisterRepository {
       ) ?? null
     )
   }
+
+  async findRegisterById(cashRegisterId: string): Promise<CashRegister | null> {
+    return this.cashRegisters.find(r => cashRegisterId === r.id) ?? null
+  }
 }
