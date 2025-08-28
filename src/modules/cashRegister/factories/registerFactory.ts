@@ -1,19 +1,39 @@
-import { makeUser } from 'src/modules/user/factories/userFactory'
-import { CashRegister } from '../entities/CashRegister'
+import { makeOperator } from 'src/modules/operator/factories/makeOperator'
+import {
+  CashRegister,
+  CashRegisterProps,
+  CashRegisterState,
+} from '../entities/CashRegister'
+import { Balance } from 'src/utils/balance'
 
-type OverrideCashRegister = Partial<CashRegister>
+const defaultBalance: Balance = {
+  cash: 0,
+  debit: 0,
+  credit: 0,
+  pix: 0,
+  check: 0,
+  onAccount: 0,
+}
 
-export const makeCashRegister = ({ id, ...override }: OverrideCashRegister) => {
-  const fakeUser = makeUser({})
+const defaultOperatorId = 'default_operator'
+const defaultRegisterId = 'default_register_id'
+
+export const makeCashRegister = (
+  props: Partial<CashRegisterProps>,
+  id?: string
+) => {
+  const fakeOperator = makeOperator({})
 
   return new CashRegister(
     {
-      initialAmount: 1000,
-      openedAt: new Date(),
-      isOpen: true,
-      userId: fakeUser.id,
-      ...override,
+      balance: { ...defaultBalance, ...props.balance },
+      state: props.state ?? CashRegisterState.OPEN,
+      operatorId: props.operatorId ?? defaultOperatorId,
+      openedAt: props.openedAt ?? new Date(),
+      closedAt: props.closedAt ?? null,
+      declaredCashClose: props.declaredCashClose ?? null,
+      ...props,
     },
-    id
+    id ?? defaultRegisterId
   )
 }

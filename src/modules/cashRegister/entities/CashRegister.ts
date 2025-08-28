@@ -1,75 +1,90 @@
 import { randomUUID } from 'crypto'
-import { Replace } from 'src/utils/replace'
+import { Balance } from '../../../utils/balance'
+import { Transaction } from 'src/utils/transaction'
 
-interface CashRegisterProps {
-  userId: string
+export enum CashRegisterState {
+  OPEN,
+  CLOSED,
+}
+
+export interface CashRegisterProps {
+  balance: Balance
+  state: CashRegisterState
+  operatorId: string
   openedAt: Date
-  closedAt?: Date | null
-  initialAmount: Number
-  closingAmount?: Number | null
-  isOpen: Boolean
+  closedAt: Date | null
+  declaredCashClose: number | null
 }
 
 export class CashRegister {
   private props: CashRegisterProps
   private _id: string
 
-  constructor(
-    props: Replace<
-      CashRegisterProps,
-      { closedAt?: Date | null; closingAmount?: Number | null }
-    >,
-    id?: string
-  ) {
+  constructor(props: CashRegisterProps, id?: string) {
     this.props = {
       ...props,
       closedAt: props.closedAt ?? null,
-      closingAmount: props.closingAmount ?? null,
-    }
+      declaredCashClose: props.declaredCashClose ?? null,
+    } as CashRegisterProps
 
-    this._id = id || randomUUID()
+    this._id = id ?? randomUUID()
   }
+
   get id(): string {
     return this._id
   }
 
-  get userId(): string {
-    return this.props.userId
+  get balance(): Balance {
+    return this.props.balance
+  }
+
+  get state(): CashRegisterState {
+    return this.props.state
+  }
+
+  get operatorId(): string {
+    return this.props.operatorId
   }
 
   get openedAt(): Date {
     return this.props.openedAt
   }
 
-  get closedAt(): Date | null | undefined {
+  get closedAt(): Date | null {
     return this.props.closedAt
   }
 
-  set closedAt(closedAtDate: Date) {
-    this.props.closedAt = closedAtDate
+  get declaredCashClose(): number | null {
+    return this.props.declaredCashClose
   }
 
-  get initialAmount(): Number {
-    return this.props.initialAmount
+  public close(amount: number) {
+    if (this.props.state === CashRegisterState.CLOSED) {
+      throw new Error('[CASH REGISTER] Close: O Caixa já está fechado.')
+    }
+
+    this.props.state = CashRegisterState.CLOSED
+    this.props.closedAt = new Date()
+    this.props.declaredCashClose = amount
   }
 
-  set initialAmount(initialAmount: Number) {
-    this.props.initialAmount = initialAmount
+  public deposit(transaction: Transaction) {
+    if (this.props.state === CashRegisterState.CLOSED) {
+      throw new Error(
+        '[CASH REGISTER] Deposit: Não foi possível efetuar o depósito. O caixa já está fechado.'
+      )
+    }
+
+    this.props.balance[transaction.type] += transaction.amount
   }
 
-  get closingAmount(): Number | null | undefined {
-    return this.props.closingAmount
-  }
+  public withdraw(transaction: Transaction) {
+    if (this.props.state === CashRegisterState.CLOSED) {
+      throw new Error(
+        '[CASH REGISTER] Withdraw: Não foi possível efetuar o saque. O caixa já está fechado.'
+      )
+    }
 
-  set closingAmount(closingAmount: Number) {
-    this.props.closingAmount = closingAmount
-  }
-
-  get isOpen(): Boolean {
-    return this.props.isOpen
-  }
-
-  set isOpen(isOpen: Boolean) {
-    this.props.isOpen = isOpen
+    this.props.balance[transaction.type] -= transaction.amount
   }
 }

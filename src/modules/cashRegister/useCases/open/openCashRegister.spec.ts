@@ -1,0 +1,92 @@
+import { CashRegister, CashRegisterState } from '../../entities/CashRegister'
+import { makeCashRegister } from '../../factories/registerFactory'
+import { FakeCashRegisterRepository } from '../../repositories/fakeCashRegisterRepository'
+import { OpenCashRegister } from './openCashRegister'
+
+let fakeCashRegisterRepository: FakeCashRegisterRepository
+let openCashRegister: OpenCashRegister
+
+describe('Open Cash Register', () => {
+  beforeEach(() => {
+    fakeCashRegisterRepository = new FakeCashRegisterRepository()
+    openCashRegister = new OpenCashRegister(fakeCashRegisterRepository)
+  })
+
+  it('Should open a cash register with a given initialAmount.', async () => {
+    const request = {
+      operatorId: 'test-user-1',
+      amount: 150,
+    }
+
+    const cashRegister = await openCashRegister.execute(request)
+
+    expect(cashRegister).toBeInstanceOf(CashRegister)
+    expect(cashRegister.operatorId).toBe(request.operatorId)
+    expect(cashRegister.balance.cash).toBe(request.amount)
+    expect(cashRegister.state).toBe(CashRegisterState.OPEN)
+  })
+
+  it('Should not open a cash register if the initial amount is negative.', async () => {
+    const request = {
+      operatorId: 'test-user-1',
+      amount: -100,
+    }
+
+    await expect(openCashRegister.execute(request)).rejects.toThrow()
+  })
+
+  it('Should throw an error when the operator already has a cash register open', async () => {
+    const cashRegister = makeCashRegister({
+      operatorId: 'test-user-1',
+      state: CashRegisterState.OPEN,
+    })
+
+    const request = {
+      operatorId: 'test-user-1',
+      amount: 100,
+    }
+
+    fakeCashRegisterRepository.save(cashRegister)
+
+    await expect(openCashRegister.execute(request)).rejects.toThrow()
+  })
+
+  it('Should persist the cashRegister on the repository', async () => {
+    const request = {
+      operatorId: 'test-user-1',
+      amount: 100,
+    }
+
+    await openCashRegister.execute(request)
+    expect(fakeCashRegisterRepository.cashRegisters).toHaveLength(1)
+    expect(fakeCashRegisterRepository.cashRegisters[0]).toBeInstanceOf(
+      CashRegister
+    )
+  })
+
+  it('Should return the cashRegister', async () => {
+    const request = {
+      operatorId: 'test-user-1',
+      amount: 100,
+    }
+
+    const cashRegister = await openCashRegister.execute(request)
+    expect(cashRegister).toBeInstanceOf(CashRegister)
+  })
+
+  it('Should not open a cashRegister without an operatorId', async () => {
+    const request = {
+      operatorId: '',
+      amount: 100,
+    }
+
+    await expect(() => openCashRegister.execute(request)).rejects.toThrow()
+
+    const request2 = {
+      operatorId: '     ',
+      amount: 100,
+    }
+
+    await expect(() => openCashRegister.execute(request)).rejects.toThrow()
+  })
+})

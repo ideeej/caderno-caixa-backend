@@ -1,55 +1,36 @@
-import { CloseCashRegisterDTO } from '../dtos/closeCashRegisterDTO'
-import { OpenCashRegisterDTO } from '../dtos/openCashRegisterDTO'
-import { CashRegister } from '../entities/CashRegister'
-import { makeCashRegister } from '../factories/registerFactory'
+import { Transaction } from 'src/utils/transaction'
+import { CashRegister, CashRegisterState } from '../entities/CashRegister'
 import { CashRegisterRepository } from './cashRegisterRepository'
 
 export class FakeCashRegisterRepository implements CashRegisterRepository {
   public cashRegisters: CashRegister[] = []
 
-  async openRegister({
-    initialAmount,
-    userId,
-  }: OpenCashRegisterDTO): Promise<CashRegister | null> {
-    const cashRegister = makeCashRegister({ initialAmount, userId })
-    this.cashRegisters.push(cashRegister)
-
-    return cashRegister ?? null
+  async save(cashRegister: CashRegister): Promise<CashRegister> {
+    const registers = this.cashRegisters.push(cashRegister)
+    return this.cashRegisters[registers - 1]
   }
 
-  async closeRegister({
-    closingAmount,
-    userId,
-  }: CloseCashRegisterDTO): Promise<void> {
-    const cashRegister = this.cashRegisters.find(
-      register => register.userId === userId && register.isOpen
-    )
+  async close(amount: number, operatorId: string): Promise<void> {
+    const cashRegister = await this.findActiveRegister(operatorId)
 
     if (cashRegister) {
-      cashRegister.closedAt = new Date()
-      cashRegister.isOpen = false
-      cashRegister.closingAmount = closingAmount
+      cashRegister.close(amount)
     }
   }
 
-  async findRegisterById(cashRegisterId: string): Promise<CashRegister | null> {
-    return (
-      this.cashRegisters.find(register => register.id === cashRegisterId) ??
-      null
-    )
+  async deposit({ amount, type }: Transaction): Promise<void> {
+    throw new Error('Method not implemented.')
   }
 
-  async findOpenRegister(userId: string): Promise<CashRegister | null> {
+  async cashOut({ amount, type }: Transaction): Promise<void> {
+    throw new Error('Method not implemented.')
+  }
+
+  async findActiveRegister(operatorId: string): Promise<CashRegister | null> {
     return (
       this.cashRegisters.find(
-        register => register.userId === userId && register.isOpen
+        r => r.state === CashRegisterState.OPEN && operatorId === r.operatorId
       ) ?? null
-    )
-  }
-
-  async findUserRegisters(userId: string): Promise<CashRegister[] | null> {
-    return (
-      this.cashRegisters.filter(register => register.userId === userId) ?? null
     )
   }
 }
