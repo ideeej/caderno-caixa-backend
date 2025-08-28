@@ -85,6 +85,12 @@ export class CashRegister {
       )
     }
 
+    if (this.props.balance[transaction.type]! < transaction.amount) {
+      throw new Error(
+        '[CASH REGISTER] Withdraw: Não foi possível efetuar o saque. Balanço insuficiente.'
+      )
+    }
+
     this.props.balance[transaction.type] -= transaction.amount
   }
 }
