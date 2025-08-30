@@ -1,4 +1,4 @@
-import { Transaction } from 'src/utils/transaction'
+import Decimal from 'decimal.js'
 import { CashRegister, CashRegisterState } from '../entities/CashRegister'
 import { CashRegisterRepository } from './cashRegisterRepository'
 
@@ -10,15 +10,17 @@ export class FakeCashRegisterRepository implements CashRegisterRepository {
       r => r.id === cashRegister.id
     )
     if (existingIndex !== -1) {
+      // This register already exists at cashRegisters[existingIndex]
       this.cashRegisters[existingIndex] = cashRegister
       return this.cashRegisters[existingIndex]
     } else {
+      // This is a new register, just push it
       const registers = this.cashRegisters.push(cashRegister)
       return this.cashRegisters[registers - 1]
     }
   }
 
-  async close(amount: number, operatorId: string): Promise<void> {
+  async close(amount: Decimal, operatorId: string): Promise<void> {
     const cashRegister = await this.findActiveRegister(operatorId)
 
     if (cashRegister) {

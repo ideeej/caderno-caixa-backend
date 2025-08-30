@@ -1,18 +1,18 @@
-import { makeOperator } from 'src/modules/operator/factories/makeOperator'
 import {
   CashRegister,
   CashRegisterProps,
   CashRegisterState,
 } from '../entities/CashRegister'
 import { Balance } from 'src/utils/balance'
+import Decimal from 'decimal.js'
 
 const defaultBalance: Balance = {
-  cash: 0,
-  debit: 0,
-  credit: 0,
-  pix: 0,
-  check: 0,
-  onAccount: 0,
+  cash: Decimal('0'),
+  debit: Decimal('0'),
+  credit: Decimal('0'),
+  pix: Decimal('0'),
+  check: Decimal('0'),
+  onAccount: Decimal('0'),
 }
 
 const defaultOperatorId = 'default_operator'
@@ -22,11 +22,12 @@ export const makeCashRegister = (
   props: Partial<CashRegisterProps>,
   id?: string
 ) => {
-  const fakeOperator = makeOperator({})
-
   return new CashRegister(
     {
-      balance: { ...defaultBalance, ...props.balance },
+      balance: {
+        ...defaultBalance,
+        ...props.balance,
+      },
       state: props.state ?? CashRegisterState.OPEN,
       operatorId: props.operatorId ?? defaultOperatorId,
       openedAt: props.openedAt ?? new Date(),

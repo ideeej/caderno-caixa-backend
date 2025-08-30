@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { CashRegisterRepository } from '../../repositories/cashRegisterRepository'
-import { Transaction } from 'src/utils/transaction'
+import { PaymentProps } from 'src/utils/payment'
 
 @Injectable()
 export class Deposit {
   constructor(private cashRegisterRepository: CashRegisterRepository) {}
 
   async execute(
-    { amount, type }: Transaction,
+    { amount, type }: PaymentProps,
     operatorId: string
   ): Promise<void> {
     const cashRegister =

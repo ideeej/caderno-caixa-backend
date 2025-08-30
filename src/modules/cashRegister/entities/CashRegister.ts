@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto'
 import { Balance } from '../../../utils/balance'
-import { Transaction } from 'src/utils/transaction'
+import { PaymentProps } from 'src/utils/payment'
+import Decimal from 'decimal.js'
 
 export enum CashRegisterState {
   OPEN,
@@ -13,7 +14,7 @@ export interface CashRegisterProps {
   operatorId: string
   openedAt: Date
   closedAt: Date | null
-  declaredCashClose: number | null
+  declaredCashClose: Decimal | null
 }
 
 export class CashRegister {
@@ -54,11 +55,11 @@ export class CashRegister {
     return this.props.closedAt
   }
 
-  get declaredCashClose(): number | null {
+  get declaredCashClose(): Decimal | null {
     return this.props.declaredCashClose
   }
 
-  public close(amount: number) {
+  public close(amount: Decimal) {
     if (this.props.state === CashRegisterState.CLOSED) {
       throw new Error('[CASH REGISTER] Close: O Caixa já está fechado.')
     }
@@ -68,29 +69,32 @@ export class CashRegister {
     this.props.declaredCashClose = amount
   }
 
-  public deposit(transaction: Transaction) {
+  public deposit(payment: PaymentProps) {
     if (this.props.state === CashRegisterState.CLOSED) {
       throw new Error(
         '[CASH REGISTER] Deposit: Não foi possível efetuar o depósito. O caixa já está fechado.'
       )
     }
-
-    this.props.balance[transaction.type] += transaction.amount
+    this.props.balance[payment.type] = this.props.balance[payment.type]!.plus(
+      payment.amount
+    )
   }
 
-  public withdraw(transaction: Transaction) {
+  public withdraw(transaction: PaymentProps) {
     if (this.props.state === CashRegisterState.CLOSED) {
       throw new Error(
         '[CASH REGISTER] Withdraw: Não foi possível efetuar o saque. O caixa já está fechado.'
       )
     }
 
-    if (this.props.balance[transaction.type]! < transaction.amount) {
+    if (this.props.balance[transaction.type]!.lt(transaction.amount)) {
       throw new Error(
         '[CASH REGISTER] Withdraw: Não foi possível efetuar o saque. Balanço insuficiente.'
       )
     }
 
-    this.props.balance[transaction.type] -= transaction.amount
+    this.props.balance[transaction.type] = this.props.balance[
+      transaction.type
+    ]!.minus(transaction.amount)
   }
 }

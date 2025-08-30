@@ -1,20 +1,22 @@
+import Decimal from 'decimal.js'
 import { CashRegisterState } from '../../entities/CashRegister'
 import { makeCashRegister } from '../../factories/registerFactory'
 import { FakeCashRegisterRepository } from '../../repositories/fakeCashRegisterRepository'
 import { Close } from './close'
+import { Balance } from 'src/utils/balance'
 
 let fakeCashRegisterRepository: FakeCashRegisterRepository
 let closeUseCase: Close
 
-describe('Close cash register', () => {
+describe('CashRegister Close Usecase', () => {
   beforeEach(() => {
     fakeCashRegisterRepository = new FakeCashRegisterRepository()
     closeUseCase = new Close(fakeCashRegisterRepository)
   })
 
   it('Should close the cashRegister for this operator id', async () => {
-    const initialBalance = 100
-    const declaredCash = 150
+    const initialBalance = Decimal('100')
+    const declaredCash = Decimal('150')
 
     const testOperatorId = 'test_operator_id'
     const cashRegister = makeCashRegister({
@@ -33,7 +35,7 @@ describe('Close cash register', () => {
     if (closedRegister) {
       expect(closedRegister.state).toBe(CashRegisterState.CLOSED)
       expect(closedRegister.closedAt).toBeInstanceOf(Date)
-      expect(closedRegister.declaredCashClose).toBe(declaredCash)
+      expect(closedRegister.declaredCashClose).toEqual(declaredCash)
     }
   })
 })

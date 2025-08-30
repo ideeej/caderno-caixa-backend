@@ -1,12 +1,14 @@
+import Decimal from 'decimal.js'
 import { makeCashRegister } from '../factories/registerFactory'
 import { CashRegisterState } from './CashRegister'
+import { PaymentType } from 'src/utils/paymentType'
 
 describe('CashRegister Entity', () => {
   // Testes de inicialização
   describe('Initialization', () => {
     it('should create an instance with default properties and correct initial balance', () => {
       // Cria uma nova instância do caixa com um valor inicial de R$ 50,00
-      const initialCash = 50.0
+      const initialCash = Decimal('50')
       const operatorId = 'test-operator-1'
       const registerId = 'mock-uuid-123'
 
@@ -35,29 +37,27 @@ describe('CashRegister Entity', () => {
   // Testes de funcionalidade principal
   describe('Core Functionality', () => {
     it('should correctly register a new deposit and withdraws in the balance', () => {
-      const initialCash = 50
-
       const cashRegister = makeCashRegister({
-        balance: { cash: initialCash },
+        balance: { cash: Decimal('50') },
       })
 
-      cashRegister.deposit({ type: 'cash', amount: 50 })
+      cashRegister.deposit({ type: PaymentType.CASH, amount: Decimal('50') })
 
-      expect(cashRegister.balance.cash).toBe(100)
+      expect(cashRegister.balance.cash).toEqual(Decimal('100'))
 
-      cashRegister.withdraw({ type: 'cash', amount: 50 })
-      expect(cashRegister.balance.cash).toBe(50)
+      cashRegister.withdraw({ type: PaymentType.CASH, amount: Decimal('50') })
+      expect(cashRegister.balance.cash).toEqual(Decimal('50'))
     })
 
     it('should correctly close the cash register with the declared amount', () => {
-      const declaredAmount = 100
+      const declaredAmount = Decimal('100')
       const cashRegister = makeCashRegister({})
 
       cashRegister.close(declaredAmount)
 
       expect(cashRegister.state).toBe(CashRegisterState.CLOSED)
 
-      expect(cashRegister.declaredCashClose).toBe(declaredAmount)
+      expect(cashRegister.declaredCashClose).toEqual(declaredAmount)
 
       expect(cashRegister.closedAt).toBeInstanceOf(Date)
     })
@@ -66,7 +66,7 @@ describe('CashRegister Entity', () => {
   // Testes de regras de negócio (Edge Cases)
   describe('Business Rules and Edge Cases', () => {
     it('should throw an error when trying to close a cash register that is already closed', () => {
-      const declaredAmount = 100
+      const declaredAmount = Decimal('100')
       const cashRegister = makeCashRegister({})
 
       cashRegister.close(declaredAmount)
@@ -75,30 +75,36 @@ describe('CashRegister Entity', () => {
     })
 
     it('should not allow deposits when the cash register is closed', () => {
-      const declaredAmount = 100
-      const amountToDeposit = 10
-      const amountToWithdraw = 10
+      const declaredAmount = Decimal('100')
+      const amountToDeposit = Decimal('10')
+      const amountToWithdraw = Decimal('10')
       const cashRegister = makeCashRegister({})
 
       cashRegister.close(declaredAmount)
 
       expect(() =>
-        cashRegister.deposit({ amount: amountToDeposit, type: 'cash' })
+        cashRegister.deposit({
+          amount: amountToDeposit,
+          type: PaymentType.CASH,
+        })
       ).toThrow()
       expect(() =>
-        cashRegister.withdraw({ amount: amountToWithdraw, type: 'cash' })
+        cashRegister.withdraw({
+          amount: amountToWithdraw,
+          type: PaymentType.CASH,
+        })
       ).toThrow()
     })
 
     it('should create an instance with correct properties even without partial data provided', () => {
       const cashRegister = makeCashRegister({})
       expect(cashRegister.balance).toEqual({
-        cash: 0,
-        debit: 0,
-        credit: 0,
-        pix: 0,
-        check: 0,
-        onAccount: 0,
+        cash: Decimal('0'),
+        debit: Decimal('0'),
+        credit: Decimal('0'),
+        pix: Decimal('0'),
+        check: Decimal('0'),
+        onAccount: Decimal('0'),
       })
 
       expect(cashRegister.state).toBe(CashRegisterState.OPEN)

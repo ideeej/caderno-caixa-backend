@@ -1,12 +1,13 @@
+import Decimal from 'decimal.js'
 import { CashRegister, CashRegisterState } from '../../entities/CashRegister'
 import { makeCashRegister } from '../../factories/registerFactory'
 import { FakeCashRegisterRepository } from '../../repositories/fakeCashRegisterRepository'
-import { OpenCashRegister } from './openCashRegister'
+import { OpenCashRegister } from './open'
 
 let fakeCashRegisterRepository: FakeCashRegisterRepository
 let openCashRegister: OpenCashRegister
 
-describe('Open Cash Register', () => {
+describe('CashRegister Open Usecase', () => {
   beforeEach(() => {
     fakeCashRegisterRepository = new FakeCashRegisterRepository()
     openCashRegister = new OpenCashRegister(fakeCashRegisterRepository)
@@ -15,21 +16,21 @@ describe('Open Cash Register', () => {
   it('Should open a cash register with a given initialAmount.', async () => {
     const request = {
       operatorId: 'test-user-1',
-      amount: 150,
+      amount: Decimal('150'),
     }
 
     const cashRegister = await openCashRegister.execute(request)
 
     expect(cashRegister).toBeInstanceOf(CashRegister)
     expect(cashRegister.operatorId).toBe(request.operatorId)
-    expect(cashRegister.balance.cash).toBe(request.amount)
+    expect(cashRegister.balance.cash).toEqual(request.amount)
     expect(cashRegister.state).toBe(CashRegisterState.OPEN)
   })
 
   it('Should not open a cash register if the initial amount is negative.', async () => {
     const request = {
       operatorId: 'test-user-1',
-      amount: -100,
+      amount: Decimal('-100'),
     }
 
     await expect(openCashRegister.execute(request)).rejects.toThrow()
@@ -43,7 +44,7 @@ describe('Open Cash Register', () => {
 
     const request = {
       operatorId: 'test-user-1',
-      amount: 100,
+      amount: Decimal('100'),
     }
 
     fakeCashRegisterRepository.save(cashRegister)
@@ -54,7 +55,7 @@ describe('Open Cash Register', () => {
   it('Should persist the cashRegister on the repository', async () => {
     const request = {
       operatorId: 'test-user-1',
-      amount: 100,
+      amount: Decimal('100'),
     }
 
     await openCashRegister.execute(request)
@@ -67,7 +68,7 @@ describe('Open Cash Register', () => {
   it('Should return the cashRegister', async () => {
     const request = {
       operatorId: 'test-user-1',
-      amount: 100,
+      amount: Decimal('100'),
     }
 
     const cashRegister = await openCashRegister.execute(request)
@@ -77,14 +78,14 @@ describe('Open Cash Register', () => {
   it('Should not open a cashRegister without an operatorId', async () => {
     const request = {
       operatorId: '',
-      amount: 100,
+      amount: Decimal('100'),
     }
 
     await expect(() => openCashRegister.execute(request)).rejects.toThrow()
 
     const request2 = {
       operatorId: '     ',
-      amount: 100,
+      amount: Decimal('100'),
     }
 
     await expect(() => openCashRegister.execute(request)).rejects.toThrow()

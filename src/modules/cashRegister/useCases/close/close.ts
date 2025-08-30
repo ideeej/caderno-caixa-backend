@@ -1,9 +1,10 @@
+import Decimal from 'decimal.js'
 import { CashRegisterRepository } from '../../repositories/cashRegisterRepository'
 
 export class Close {
   constructor(private cashRegisterRepository: CashRegisterRepository) {}
 
-  async execute(amount: number, operatorId: string) {
+  async execute(amount: Decimal, operatorId: string) {
     const cashRegister =
       await this.cashRegisterRepository.findActiveRegister(operatorId)
 
