@@ -1,8 +1,10 @@
+import Decimal from 'decimal.js'
+
 export interface Balance {
-  cash: number
-  debit?: number
-  credit?: number
-  pix?: number
-  check?: number
-  onAccount?: number
+  cash: Decimal
+  debit?: Decimal
+  credit?: Decimal
+  pix?: Decimal
+  check?: Decimal
+  onAccount?: Decimal
 }
