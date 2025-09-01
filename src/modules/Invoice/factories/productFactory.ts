@@ -1,8 +1,5 @@
 import Decimal from 'decimal.js'
-import {
-  ProductItem,
-  ProductProps,
-} from '../entities/InvoiceItem/entities/productItem'
+import { ProductItem, ProductProps } from '../../../utils/productItem'
 import { SaleUnits } from 'src/utils/saleUnit'
 
 export const test_product_id = 'test_product_id'

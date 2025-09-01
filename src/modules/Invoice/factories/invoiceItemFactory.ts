@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js'
 import { InvoiceItem } from '../entities/InvoiceItem/entities/invoiceItem'
-import { ProductItem } from '../entities/InvoiceItem/entities/productItem'
+import { ProductItem } from '../../../utils/productItem'
 import { makeProductItem } from './productFactory'
 
 export const testInvoiceItemId = 'test_invoice_item_id'

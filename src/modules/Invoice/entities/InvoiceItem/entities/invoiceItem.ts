@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto'
 import Decimal from 'decimal.js'
-import { ProductItem, ProductProps } from './productItem'
+import { ProductItem, ProductProps } from '../../../../../utils/productItem'
 
 export interface InvoiceItemProps {
   product: ProductProps
