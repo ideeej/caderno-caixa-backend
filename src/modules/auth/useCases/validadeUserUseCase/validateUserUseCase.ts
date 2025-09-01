@@ -1,30 +1,33 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { compare } from "bcrypt";
-import { User } from "src/modules/user/entities/User";
-import { UserRepository } from "src/modules/user/repositories/UserRepository";
+import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { compare } from 'bcrypt'
+import { User } from 'src/modules/auth/user/entities/User'
+import { UserRepository } from 'src/modules/auth/user/repositories/UserRepository'
 
 interface ValidateUserRequest {
-    email: string
-    password: string
+  email: string
+  password: string
 }
 
 @Injectable()
-export class ValidateUserUseCase{
-    constructor(private userRepository:UserRepository) {}
+export class ValidateUserUseCase {
+  constructor(private userRepository: UserRepository) {}
 
-    async execute({email, password}:ValidateUserRequest): Promise<User | UnauthorizedException> {
-        const user = await this.userRepository.findByEmail(email)
+  async execute({
+    email,
+    password,
+  }: ValidateUserRequest): Promise<User | UnauthorizedException> {
+    const user = await this.userRepository.findByEmail(email)
 
-        if (!user) {
-            throw new UnauthorizedException("Incorrect email or password.");
-        }
-
-        let passwordMatched = await compare(password, user.password)
-
-        if (!passwordMatched) {
-            throw new UnauthorizedException("Incorrect email or password.");
-        }
-        
-        return user;
+    if (!user) {
+      throw new UnauthorizedException('Incorrect email or password.')
     }
+
+    let passwordMatched = await compare(password, user.password)
+
+    if (!passwordMatched) {
+      throw new UnauthorizedException('Incorrect email or password.')
+    }
+
+    return user
+  }
 }

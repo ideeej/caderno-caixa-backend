@@ -1,53 +1,53 @@
-import { FakeUserRepository } from "src/modules/user/repositories/FakeUserRepository";
-import { ValidateUserUseCase } from "./validateUserUseCase";
-import { hash } from "bcrypt";
-import { makeUser } from "src/modules/user/factories/userFactory";
-import { rejects } from "assert";
-import { UnauthorizedException } from "@nestjs/common";
+import { FakeUserRepository } from 'src/modules/auth/user/repositories/FakeUserRepository'
+import { ValidateUserUseCase } from './validateUserUseCase'
+import { hash } from 'bcrypt'
+import { makeUser } from 'src/modules/auth/user/factories/userFactory'
+import { rejects } from 'assert'
+import { UnauthorizedException } from '@nestjs/common'
 
-let validateUserUseCase : ValidateUserUseCase
-let fakeUserRepository : FakeUserRepository
+let validateUserUseCase: ValidateUserUseCase
+let fakeUserRepository: FakeUserRepository
 
-describe("Validate user", () => {
-    beforeEach(() => {
-        fakeUserRepository = new FakeUserRepository();
-        validateUserUseCase = new ValidateUserUseCase(fakeUserRepository);
+describe('Validate user', () => {
+  beforeEach(() => {
+    fakeUserRepository = new FakeUserRepository()
+    validateUserUseCase = new ValidateUserUseCase(fakeUserRepository)
+  })
+
+  it('Should return user if credentials match.', async () => {
+    const rawPassword = '123456'
+
+    const user = makeUser({ password: await hash(rawPassword, 10) })
+
+    fakeUserRepository.users = [user]
+
+    const result = await validateUserUseCase.execute({
+      email: user.email,
+      password: rawPassword,
     })
 
-    it("Should return user if credentials match.", async () => {
-        const rawPassword = "123456";
+    expect(result).toEqual(user)
+  })
 
-        const user = makeUser({password: await hash(rawPassword, 10)});
-        
-        fakeUserRepository.users = [user]
+  it('Should throw an Error when credentials do not match.', async () => {
+    const rawPassword = '123'
 
-        const result = await validateUserUseCase.execute({
-            email: user.email,
-            password: rawPassword
-        })
+    const user = makeUser({ password: await hash(rawPassword, 10) })
 
-        expect(result).toEqual(user);
-    })
+    fakeUserRepository.users = [user]
 
-    it("Should throw an Error when credentials do not match.", async () => {
-        const rawPassword = "123";
+    expect(async () => {
+      await validateUserUseCase.execute({
+        email: 'incorrect@gmail.com',
+        password: rawPassword,
+      })
+    }).rejects.toThrow(UnauthorizedException)
 
-        const user = makeUser({password: await hash(rawPassword,10)});
-
-        fakeUserRepository.users = [user]
-
-        expect(async () => {
-            await validateUserUseCase.execute({
-                email: "incorrect@gmail.com",
-                password: rawPassword
-            })
-        }).rejects.toThrow(UnauthorizedException);
-
-        expect(async () => {
-            await validateUserUseCase.execute({
-                email: user.email,
-                password: "incorrect password"
-            })
-        }).rejects.toThrow(UnauthorizedException);
-    })
-});
+    expect(async () => {
+      await validateUserUseCase.execute({
+        email: user.email,
+        password: 'incorrect password',
+      })
+    }).rejects.toThrow(UnauthorizedException)
+  })
+})

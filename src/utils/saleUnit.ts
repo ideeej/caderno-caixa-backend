@@ -25,8 +25,8 @@ export class SaleUnit {
 }
 
 // Para manter a clareza e ter um conjunto fixo de opções
-export const SaleUnits = {
-  UNIT: new SaleUnit({ code: 'UN', symbol: 'un', description: 'Unidade' }),
+export const Units = {
+  UNITARY: new SaleUnit({ code: 'UN', symbol: 'un', description: 'Unidade' }),
   KILOGRAM: new SaleUnit({
     code: 'KG',
     symbol: 'kg',

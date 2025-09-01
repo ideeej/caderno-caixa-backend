@@ -1,29 +1,28 @@
-import { User } from "src/modules/user/entities/User";
-import { UserRepository } from "src/modules/user/repositories/UserRepository";
-import { PrismaService } from "../prisma.service";
-import { PrismaUserMapper } from "../mappers/PrismaUserMapper";
-import { Injectable } from "@nestjs/common";
+import { User } from 'src/modules/auth/user/entities/User'
+import { UserRepository } from 'src/modules/auth/user/repositories/UserRepository'
+import { PrismaService } from '../prisma.service'
+import { PrismaUserMapper } from '../mappers/PrismaUserMapper'
+import { Injectable } from '@nestjs/common'
 
 @Injectable()
 export class PrismaUserRepository implements UserRepository {
-    constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
 
-    async create(user: User): Promise<void> {
-        const prismaUser = PrismaUserMapper.toPrismaUser(user);
+  async create(user: User): Promise<void> {
+    const prismaUser = PrismaUserMapper.toPrismaUser(user)
 
-        await this.prisma.user.create({
-            data: prismaUser
-        })
+    await this.prisma.user.create({
+      data: prismaUser,
+    })
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({ where: { email } })
+
+    if (!user) {
+      return null
     }
 
-    async findByEmail(email: string): Promise<User | null> {
-        const user = await this.prisma.user.findUnique({where:{email}})
-        
-        if (!user) {
-            return null;
-        }
-
-        return PrismaUserMapper.toDomain(user);
-    }
-
+    return PrismaUserMapper.toDomain(user)
+  }
 }

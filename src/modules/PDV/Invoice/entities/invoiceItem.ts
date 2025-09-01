@@ -1,9 +1,9 @@
 import { randomUUID } from 'crypto'
 import Decimal from 'decimal.js'
-import { ProductItem, ProductProps } from '../../../../../utils/productItem'
+import { ProductItem, ProductItemProps } from 'src/utils/productItem'
 
 export interface InvoiceItemProps {
-  product: ProductProps
+  product: ProductItemProps
   quantity: Decimal
   total: Decimal
 }
@@ -16,7 +16,7 @@ export class InvoiceItem {
     this.props = {
       product,
       quantity: quantity,
-      total: product.unitPrice.times(quantity),
+      total: product.price.times(quantity),
     }
 
     this._id = id || randomUUID()
@@ -26,7 +26,7 @@ export class InvoiceItem {
     return this._id
   }
 
-  get product(): ProductProps {
+  get product(): ProductItemProps {
     return this.props.product
   }
 
@@ -35,10 +35,10 @@ export class InvoiceItem {
   }
 
   get total(): Decimal {
-    return this.props.product.unitPrice.times(this.props.quantity)
+    return this.props.product.price.times(this.props.quantity)
   }
 
   updateTotal() {
-    this.props.total = this.props.product.unitPrice.times(this.props.quantity)
+    this.props.total = this.props.product.price.times(this.props.quantity)
   }
 }

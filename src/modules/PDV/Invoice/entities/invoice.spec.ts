@@ -74,8 +74,8 @@ describe('Invoice Entity', () => {
     it('Subtotal should be calculated correctly', () => {
       const testInvoice = makeInvoice({})
 
-      const testProduct = makeProductItem({ unitPrice: Decimal('2.99') })
-      const testProduct2 = makeProductItem({ unitPrice: Decimal('2.99') })
+      const testProduct = makeProductItem({ price: Decimal('2.99') })
+      const testProduct2 = makeProductItem({ price: Decimal('2.99') })
 
       const testItem = makeInvoiceItem({ product: testProduct })
       const testItem2 = makeInvoiceItem({ product: testProduct2 })
@@ -84,7 +84,7 @@ describe('Invoice Entity', () => {
       testInvoice.addItem(testItem2)
 
       expect(testInvoice.subtotal).toEqual(
-        testProduct.unitPrice.plus(testProduct2.unitPrice)
+        testProduct.price.plus(testProduct2.price)
       )
     })
   })

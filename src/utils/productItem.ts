@@ -2,19 +2,19 @@ import { randomUUID } from 'crypto'
 import Decimal from 'decimal.js'
 import { SaleUnit } from 'src/utils/saleUnit'
 
-export interface ProductProps {
+export interface ProductItemProps {
   barcode: string
   name: string
   saleUnit: SaleUnit
-  unitPrice: Decimal
+  price: Decimal
   unitValue: Decimal
 }
 
 export class ProductItem {
-  private props: ProductProps
+  private props: ProductItemProps
   private _id: string
 
-  constructor(props: ProductProps, id?: string) {
+  constructor(props: ProductItemProps, id?: string) {
     this.props = props
     this._id = id || randomUUID()
   }
@@ -35,8 +35,8 @@ export class ProductItem {
     return this.props.saleUnit
   }
 
-  get unitPrice(): Decimal {
-    return this.props.unitPrice
+  get price(): Decimal {
+    return this.props.price
   }
 
   get unitValue(): Decimal {

@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto'
-import { Balance } from '../../../utils/balance'
+import { Balance } from 'src/utils/balance'
 import { PaymentProps } from 'src/utils/payment'
 import Decimal from 'decimal.js'
 
