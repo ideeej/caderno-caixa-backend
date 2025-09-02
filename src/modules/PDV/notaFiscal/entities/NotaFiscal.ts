@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto'
 import { Payment } from 'src/utils/payment'
-import { InvoiceItem } from './invoiceItem'
+import { InvoiceItem } from './NotaFiscalItem'
 import Decimal from 'decimal.js'
 
 //Invoice ~ Nota fiscal

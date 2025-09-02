@@ -1,11 +1,8 @@
 import Decimal from 'decimal.js'
-import { makeInvoice } from '../factories/invoiceFactory'
-import {
-  makeInvoiceItem,
-  testInvoiceItem,
-} from '../factories/invoiceItemFactory'
+import { makeInvoice } from '../factories/NotaFiscalFactory'
+import { makeInvoiceItem } from '../factories/NotaFiscalItemFactory'
 import { makeProductItem } from '../factories/productFactory'
-import { InvoiceState } from './invoice'
+import { InvoiceState } from './NotaFiscal'
 
 describe('Invoice Entity', () => {
   describe('Core', () => {

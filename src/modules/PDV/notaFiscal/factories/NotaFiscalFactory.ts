@@ -1,4 +1,4 @@
-import { Invoice, InvoiceProps, InvoiceState } from '../entities/invoice'
+import { Invoice, InvoiceProps, InvoiceState } from '../entities/NotaFiscal'
 
 export const testInvoiceId = 'test_invoice_id'
 export const testOperatorId = 'test_operator'

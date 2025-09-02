@@ -1,5 +1,5 @@
 import Decimal from 'decimal.js'
-import { InvoiceItem } from '../entities/invoiceItem'
+import { InvoiceItem } from '../entities/NotaFiscalItem'
 import { ProductItem } from 'src/utils/productItem'
 import { makeProductItem } from './productFactory'
 
