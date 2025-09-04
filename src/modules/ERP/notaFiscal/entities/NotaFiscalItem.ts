@@ -1,18 +1,18 @@
 import { randomUUID } from 'crypto'
 import Decimal from 'decimal.js'
-import { ProductItem, ProductItemProps } from 'src/utils/productItem'
+import { Product, ProductProps } from '../../product/product'
 
-export interface InvoiceItemProps {
-  product: ProductItemProps
+export interface NotaFiscalItemsProps {
+  product: ProductProps
   quantity: Decimal
   total: Decimal
 }
 
-export class InvoiceItem {
-  private props: InvoiceItemProps
+export class NotaFiscalItem {
+  private props: NotaFiscalItemsProps
   private _id: string
 
-  constructor(product: ProductItem, quantity: Decimal, id?: string) {
+  constructor(product: Product, quantity: Decimal, id?: string) {
     this.props = {
       product,
       quantity: quantity,
@@ -26,7 +26,7 @@ export class InvoiceItem {
     return this._id
   }
 
-  get product(): ProductItemProps {
+  get product(): ProductProps {
     return this.props.product
   }
 

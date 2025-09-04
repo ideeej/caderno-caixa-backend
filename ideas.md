@@ -4,12 +4,26 @@
 
 ## 📌 Para a A primeira versão (V1)
 
-- **[REFACTOR] Invoice** Trocar o nome para NotaFiscal e colocar no ERP
-- **[REFACTOR] NotaFiscal** Adicionar no ERP
-- **[FEAT] NotaFiscal** Para entrada, saída, Consumidor
-- **[FEAT] ERP>Produtos** Essas notas fiscais devem ficar no ERP
-- **[FEAT] ERP>Inventário** Classe para gerenciar quantidade de produtos em estoque
+- **NotaFiscal**
+  [ ] Calcular troco
+- **Product Catalog**
+  [ ] Create products
+  [ ] Find products
+  [ ] Edit products
+  [ ] delete products
+- **Inventory/Stock**
+  [ ] Create an empty inventory
+  [ ] Add Products in Inventory
+  [ ] find products in Inventory
+  [ ] Edit products in Inventory
+  [ ] Delete products in inventory
+- **CashRegister**
+  [ ] Should work with NotaFiscal
 
 ## 🚀 Ideias de Longo Prazo
 
+...
+
 ## 💡 Ideias Aleatórias / Brainstorming
+
+...

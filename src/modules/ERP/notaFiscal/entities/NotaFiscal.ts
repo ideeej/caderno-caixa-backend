@@ -1,34 +1,34 @@
 import { randomUUID } from 'crypto'
-import { Payment } from 'src/utils/payment'
-import { InvoiceItem } from './NotaFiscalItem'
+import { Payment, PaymentProps } from 'src/utils/payment'
+import { NotaFiscalItem } from './NotaFiscalItem'
 import Decimal from 'decimal.js'
 
 //Invoice ~ Nota fiscal
 
-export enum InvoiceState {
+export enum NotaFiscalState {
   OPEN = 'OPEN',
   FINALIZING = 'FINALIZING',
   CLOSED = 'CLOSED',
 }
 
-export interface InvoiceProps {
+export interface NotaFiscalProps {
   cashRegisterId: string
   operatorId: string
   payments: Payment[]
-  items: InvoiceItem[]
-  state: InvoiceState
+  items: NotaFiscalItem[]
+  state: NotaFiscalState
   createdAt: Date
   closedAt: Date | null
 }
 
-export class Invoice {
-  private props: InvoiceProps
+export class NotaFiscal {
+  private props: NotaFiscalProps
   private _id: string
 
-  constructor(props: InvoiceProps, id?: string) {
+  constructor(props: NotaFiscalProps, id?: string) {
     this.props = {
       ...props,
-      state: props.state || InvoiceState.OPEN,
+      state: props.state || NotaFiscalState.OPEN,
       createdAt: props.createdAt || new Date(),
     }
 
@@ -47,7 +47,7 @@ export class Invoice {
     return this.props.operatorId
   }
 
-  get state(): InvoiceState {
+  get state(): NotaFiscalState {
     return this.props.state
   }
 
@@ -63,7 +63,7 @@ export class Invoice {
     return this.props.payments
   }
 
-  get items(): InvoiceItem[] {
+  get items(): NotaFiscalItem[] {
     return this.props.items
   }
 
@@ -81,8 +81,8 @@ export class Invoice {
     )
   }
 
-  addItem(item: InvoiceItem) {
-    if (this.props.state !== InvoiceState.OPEN) {
+  addItem(item: NotaFiscalItem) {
+    if (this.props.state !== NotaFiscalState.OPEN) {
       throw new Error(
         'Não é possível adicionar itens. A nota fiscal não está aberta para edição de itens.'
       )
@@ -90,8 +90,8 @@ export class Invoice {
     this.props.items.push(item)
   }
 
-  removeByIndex(index: number): InvoiceItem[] {
-    if (this.props.state !== InvoiceState.OPEN) {
+  removeByIndex(index: number): NotaFiscalItem[] {
+    if (this.props.state !== NotaFiscalState.OPEN) {
       throw new Error(
         'Não é possível remover itens. A nota fiscal não está aberta para edição de itens.'
       )
@@ -99,8 +99,8 @@ export class Invoice {
     return this.props.items.splice(index, 1)
   }
 
-  removeById(id: string): InvoiceItem[] {
-    if (this.props.state !== InvoiceState.OPEN) {
+  removeById(id: string): NotaFiscalItem[] {
+    if (this.props.state !== NotaFiscalState.OPEN) {
       throw new Error(
         'Não é possível remover itens. A nota fiscal não está aberta para edição de itens.'
       )
@@ -110,8 +110,8 @@ export class Invoice {
     return this.props.items.splice(indexToRemove, 1)
   }
 
-  removeItemsByIds(ids: string[]): InvoiceItem[] {
-    if (this.props.state !== InvoiceState.OPEN) {
+  removeItemsByIds(ids: string[]): NotaFiscalItem[] {
+    if (this.props.state !== NotaFiscalState.OPEN) {
       throw new Error(
         'Não é possível remover itens. A nota fiscal não está aberta para edição de itens.'
       )
@@ -124,8 +124,8 @@ export class Invoice {
     return this.props.items
   }
 
-  addPayment({ amount, type }: Payment) {
-    if (this.props.state !== InvoiceState.FINALIZING) {
+  addPayment({ amount, type }: PaymentProps) {
+    if (this.props.state !== NotaFiscalState.FINALIZING) {
       throw new Error(
         'Não é possível adicionar pagamentos. A nota fiscal não está em modo de finalização.'
       )
@@ -134,7 +134,7 @@ export class Invoice {
   }
 
   cancelPayment(index: number): Payment {
-    if (this.props.state !== InvoiceState.FINALIZING) {
+    if (this.props.state !== NotaFiscalState.FINALIZING) {
       throw new Error(
         'Não é possível cancelar pagamentos. A nota fiscal não está em modo de finalização.'
       )
@@ -143,27 +143,31 @@ export class Invoice {
   }
 
   finalize() {
-    if (this.props.state !== InvoiceState.OPEN) {
+    if (this.props.state !== NotaFiscalState.OPEN) {
       throw new Error(
         'A nota fiscal já está em processo de finalização ou já está fechada.'
       )
     }
-    this.props.state = InvoiceState.FINALIZING
+    this.props.state = NotaFiscalState.FINALIZING
   }
 
   close() {
-    if (this.props.state !== InvoiceState.FINALIZING) {
+    if (this.props.state !== NotaFiscalState.FINALIZING) {
       throw new Error(
         'A nota fiscal não está em processo de finalização. Não há pagamentos para fechar essa nota fiscal.'
       )
     }
-    this.props.state = InvoiceState.CLOSED
+    this.props.state = NotaFiscalState.CLOSED
     this.props.closedAt = new Date()
   }
 
   revertToOpen() {
-    if (this.props.state === InvoiceState.FINALIZING) {
-      this.props.state = InvoiceState.OPEN
+    if (this.props.state === NotaFiscalState.CLOSED) {
+      throw new Error('A nota fiscal já foi fechada.')
+    }
+
+    if (this.props.state === NotaFiscalState.FINALIZING) {
+      this.props.state = NotaFiscalState.OPEN
       this.props.payments = []
     }
   }
