@@ -2,9 +2,9 @@ import Decimal from 'decimal.js'
 import { makeNotaFiscal } from '../factories/NotaFiscalFactory'
 import { makeNotaFiscalItem } from '../factories/NotaFiscalItemFactory'
 import { makeProduct } from '../../product/productFactory'
-import { NotaFiscal, NotaFiscalState } from './NotaFiscal'
+import { NotaFiscalState } from './NotaFiscal'
 import { PaymentType } from 'src/utils/paymentType'
-import { Payment, PaymentProps } from 'src/utils/payment'
+import { PaymentProps } from 'src/utils/payment'
 
 describe('Domain NotaFiscal', () => {
   describe('Core', () => {
@@ -99,7 +99,7 @@ describe('Domain NotaFiscal', () => {
         testNotaFiscal = makeNotaFiscal({})
       })
 
-      test('addPayment should add payments and update totalPaid', () => {
+      test('addPayment should add payments and update totalPaid and change', () => {
         const products = [
           makeProduct({ price: Decimal('3.59') }),
           makeProduct({ price: Decimal('6.99') }),
@@ -132,9 +132,10 @@ describe('Domain NotaFiscal', () => {
           testNotaFiscal.addPayment(payment)
         })
         expect(testNotaFiscal.totalPaid).toEqual(Decimal('32.81'))
+        expect(testNotaFiscal.change).toEqual(Decimal('22.23'))
       })
 
-      test('cancelPayment should remove payments and update totalPaid', () => {
+      test('cancelPayment should remove payments and update totalPaid and change', () => {
         const products = [
           makeProduct({ price: Decimal('3.59') }),
           makeProduct({ price: Decimal('6.99') }),
@@ -160,7 +161,7 @@ describe('Domain NotaFiscal', () => {
             type: PaymentType.CASH,
           },
           {
-            amount: Decimal('10.56'),
+            amount: Decimal('20'),
             type: PaymentType.CASH,
           },
         ]
@@ -169,15 +170,20 @@ describe('Domain NotaFiscal', () => {
           testNotaFiscal.addPayment(payment)
         })
 
+        expect(testNotaFiscal.change).toEqual(Decimal('9.44'))
+
         // Cancels by Index
         testNotaFiscal.cancelPayment(2)
         expect(testNotaFiscal.totalPaid).toEqual(Decimal('15'))
+        expect(testNotaFiscal.change).toEqual(Decimal('10.56'))
 
         testNotaFiscal.cancelPayment(1)
         expect(testNotaFiscal.totalPaid).toEqual(Decimal('10'))
+        expect(testNotaFiscal.change).toEqual(Decimal('15.56'))
 
         testNotaFiscal.cancelPayment(0)
         expect(testNotaFiscal.totalPaid).toEqual(Decimal('0'))
+        expect(testNotaFiscal.change).toEqual(testNotaFiscal.subtotal)
       })
     })
 

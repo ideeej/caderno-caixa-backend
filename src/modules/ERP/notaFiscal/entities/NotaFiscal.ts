@@ -81,6 +81,10 @@ export class NotaFiscal {
     )
   }
 
+  get change(): Decimal {
+    return this.subtotal.minus(this.totalPaid).abs()
+  }
+
   addItem(item: NotaFiscalItem) {
     if (this.props.state !== NotaFiscalState.OPEN) {
       throw new Error(
