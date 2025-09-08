@@ -9,14 +9,14 @@
 - **Product Catalog**
   [OK] Create products
   [OK] Find products
-  [ ] Edit products
+  [OK] Edit products
   [OK] delete products
 - **Inventory/Stock**
-  [ ] Create an empty inventory
-  [ ] Add Products in Inventory
-  [ ] find products in Inventory
-  [ ] Edit products in Inventory
-  [ ] Delete products in inventory
+  [OK] Create an empty inventory
+  [OK] Add Products in Inventory
+  [OK] find products in Inventory
+  [OK] Edit products in Inventory
+  [OK] Delete products in inventory
 - **CashRegister**
   [ ] Should work with NotaFiscal
 
