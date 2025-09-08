@@ -2,7 +2,7 @@ import {
   CashRegister,
   CashRegisterProps,
   CashRegisterState,
-} from '../entities/CashRegister'
+} from './CashRegister'
 import { Balance } from 'src/utils/balance'
 import Decimal from 'decimal.js'
 

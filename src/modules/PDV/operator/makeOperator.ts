@@ -1,4 +1,4 @@
-import { Operator } from '../entities/operator'
+import { Operator } from './operator'
 
 type OverrideCashRegister = Partial<Operator>
 

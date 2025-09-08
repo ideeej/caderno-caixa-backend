@@ -1,6 +1,14 @@
 import { randomUUID } from 'crypto'
-import { PaymentType } from './paymentType'
 import Decimal from 'decimal.js'
+
+export enum PaymentType {
+  CASH = 'cash',
+  DEBIT = 'debit',
+  CREDIT = 'credit',
+  PIX = 'pix',
+  CHECK = 'check',
+  ONACCOUNT = 'onAccount',
+}
 
 export interface PaymentProps {
   type: PaymentType

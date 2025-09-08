@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
-import { makeCashRegister } from '../factories/registerFactory'
+import { makeCashRegister } from './registerFactory'
 import { CashRegisterState } from './CashRegister'
-import { PaymentType } from 'src/utils/paymentType'
+import { PaymentType } from 'src/utils/payment'
 
 describe('CashRegister Entity', () => {
   // Testes de inicialização

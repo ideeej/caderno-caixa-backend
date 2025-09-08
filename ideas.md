@@ -5,12 +5,12 @@
 ## 📌 Para a A primeira versão (V1)
 
 - **NotaFiscal**
-  [ ] Calcular troco
+  [OK] Calcular troco
 - **Product Catalog**
-  [ ] Create products
-  [ ] Find products
+  [OK] Create products
+  [OK] Find products
   [ ] Edit products
-  [ ] delete products
+  [OK] delete products
 - **Inventory/Stock**
   [ ] Create an empty inventory
   [ ] Add Products in Inventory

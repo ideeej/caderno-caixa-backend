@@ -1,13 +1,15 @@
 import Decimal from 'decimal.js'
 import { Product, ProductProps } from './product'
-import { Units } from 'src/utils/saleUnit'
+import { PricingType } from 'src/utils/pricingType'
+import { MeasuringUnit } from 'src/utils/measuringUnit'
 
 export const test_product: ProductProps = {
-  barcode: '7891234500001',
-  name: 'test_product_1',
-  saleUnit: Units.UNITARY,
-  price: Decimal('1'),
-  unitValue: Decimal('1'),
+  barcode: '7894900010015',
+  name: 'Coca cola lata',
+  description: '',
+  price: Decimal('3.99'),
+  measuringUnit: MeasuringUnit.unit('1'),
+  pricingType: PricingType.UNITARY,
 }
 
 export const makeProduct = (props: Partial<ProductProps>, id?: string) => {

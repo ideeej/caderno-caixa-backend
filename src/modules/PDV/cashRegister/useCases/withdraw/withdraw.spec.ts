@@ -1,10 +1,9 @@
 import Decimal from 'decimal.js'
-import { CashRegisterState } from '../../entities/CashRegister'
-import { makeCashRegister } from '../../factories/registerFactory'
+import { CashRegisterState } from '../../CashRegister'
+import { makeCashRegister } from '../../registerFactory'
 import { FakeCashRegisterRepository } from '../../repositories/fakeCashRegisterRepository'
 import { Withdraw } from './withdraw'
-import { PaymentType } from 'src/utils/paymentType'
-import { Balance } from 'src/utils/balance'
+import { PaymentType } from 'src/utils/payment'
 
 let fakeCashRegisterRepository: FakeCashRegisterRepository
 let withdrawUsecase: Withdraw

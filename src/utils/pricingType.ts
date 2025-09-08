@@ -1,4 +1,4 @@
-export interface PricingType {
-  weight
-  unitary
+export enum PricingType {
+  WEIGHT = 'weight',
+  UNITARY = 'unitary',
 }

@@ -1,15 +1,15 @@
 import { randomUUID } from 'crypto'
 import Decimal from 'decimal.js'
-import { SaleUnit } from 'src/utils/saleUnit'
-
-export interface ProductDto {}
+import { MeasuringUnit } from 'src/utils/measuringUnit'
+import { PricingType } from 'src/utils/pricingType'
 
 export interface ProductProps {
   barcode: string
   name: string
-  saleUnit: SaleUnit
+  description: string
   price: Decimal
-  unitValue: Decimal
+  pricingType: PricingType
+  measuringUnit: MeasuringUnit
 }
 
 export class Product {
@@ -29,19 +29,27 @@ export class Product {
     return this.props.name
   }
 
-  get barcode(): string {
-    return this.props.barcode
+  get description(): string {
+    return this.props.description
   }
 
-  get saleUnit(): SaleUnit {
-    return this.props.saleUnit
+  get barcode(): string {
+    return this.props.barcode
   }
 
   get price(): Decimal {
     return this.props.price
   }
 
-  get unitValue(): Decimal {
-    return this.props.unitValue
+  get measuringUnit(): MeasuringUnit {
+    return this.props.measuringUnit
+  }
+
+  get pricingType(): PricingType {
+    return this.props.pricingType
+  }
+
+  edit(props: ProductProps) {
+    this.props = { ...props }
   }
 }

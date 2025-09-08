@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { CashRegisterRepository } from '../../repositories/cashRegisterRepository'
-import { CashRegister, CashRegisterState } from '../../entities/CashRegister'
+import { CashRegister, CashRegisterState } from '../../CashRegister'
 import Decimal from 'decimal.js'
 
 interface OpenCashRegisterRequest {

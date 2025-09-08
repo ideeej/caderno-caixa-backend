@@ -1,5 +1,5 @@
 import Decimal from 'decimal.js'
-import { CashRegister } from '../entities/CashRegister'
+import { CashRegister } from '../CashRegister'
 
 export abstract class CashRegisterRepository {
   abstract save(cashRegister: CashRegister): Promise<CashRegister>

@@ -1,8 +1,8 @@
 import Decimal from 'decimal.js'
-import { CashRegister, CashRegisterState } from '../../entities/CashRegister'
-import { makeCashRegister } from '../../factories/registerFactory'
+import { CashRegister, CashRegisterState } from '../../CashRegister'
 import { FakeCashRegisterRepository } from '../../repositories/fakeCashRegisterRepository'
 import { OpenCashRegister } from './open'
+import { makeCashRegister } from '../../registerFactory'
 
 let fakeCashRegisterRepository: FakeCashRegisterRepository
 let openCashRegister: OpenCashRegister

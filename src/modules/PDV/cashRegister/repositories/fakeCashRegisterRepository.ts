@@ -1,5 +1,5 @@
 import Decimal from 'decimal.js'
-import { CashRegister, CashRegisterState } from '../entities/CashRegister'
+import { CashRegister, CashRegisterState } from '../CashRegister'
 import { CashRegisterRepository } from './cashRegisterRepository'
 
 export class FakeCashRegisterRepository implements CashRegisterRepository {

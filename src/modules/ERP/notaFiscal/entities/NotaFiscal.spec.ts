@@ -3,7 +3,7 @@ import { makeNotaFiscal } from '../factories/NotaFiscalFactory'
 import { makeNotaFiscalItem } from '../factories/NotaFiscalItemFactory'
 import { makeProduct } from '../../product/productFactory'
 import { NotaFiscalState } from './NotaFiscal'
-import { PaymentType } from 'src/utils/paymentType'
+import { PaymentType } from 'src/utils/payment'
 import { PaymentProps } from 'src/utils/payment'
 
 describe('Domain NotaFiscal', () => {
