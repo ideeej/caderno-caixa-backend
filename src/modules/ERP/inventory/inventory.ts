@@ -1,21 +1,13 @@
-import { randomUUID } from 'crypto'
-import { InventoryItem, inventoryItemProps } from './inventoryItem'
+import { InventoryItem } from './inventoryItem'
+import { Entity } from 'src/modules/entity'
 
 export interface InventoryProps {
   items: Map<string, InventoryItem>
 }
 
-export class Inventory {
-  private props
-  private _id
-
+export class Inventory extends Entity<InventoryProps> {
   constructor(props: InventoryProps, id?: string) {
-    this.props = { ...props }
-    this._id = id ?? randomUUID()
-  }
-
-  get id(): string {
-    return this._id
+    super(props, id)
   }
 
   get items(): Map<string, InventoryItem> {
@@ -27,19 +19,19 @@ export class Inventory {
   }
 
   addItem(inventoryItem: InventoryItem) {
-    const existingItem: InventoryItem = this.props.items.get(
+    const existingItem: InventoryItem | undefined = this.props.items.get(
       inventoryItem.product.barcode
     )
 
-    if (existingItem) {
-      const updatedItem = new InventoryItem({
-        product: inventoryItem.product,
-        quantity: inventoryItem.quantity + existingItem.quantity,
-      })
-      this.props.items.set(inventoryItem.product.barcode, updatedItem)
-    } else {
-      this.props.items.set(inventoryItem.product.barcode, inventoryItem)
+    if (!existingItem) {
+      return this.props.items.set(inventoryItem.product.barcode, inventoryItem)
     }
+
+    const updatedItem = new InventoryItem({
+      product: inventoryItem.product,
+      quantity: inventoryItem.quantity + existingItem.quantity,
+    })
+    this.props.items.set(inventoryItem.product.barcode, updatedItem)
   }
 
   editItem(originalItem: InventoryItem, updatedItem: InventoryItem) {
