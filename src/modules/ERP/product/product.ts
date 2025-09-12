@@ -25,6 +25,10 @@ export class Product {
     return this._id
   }
 
+  toProps(): ProductProps {
+    return { ...this.props }
+  }
+
   get name(): string {
     return this.props.name
   }

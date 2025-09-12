@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto'
 import { ProductProps } from '../product/product'
 
 export interface inventoryItemProps {
+  productId: string
   product: ProductProps
   quantity: number
 }
@@ -19,12 +20,16 @@ export class InventoryItem {
     return this._id
   }
 
+  get productId(): string {
+    return this.props.productId
+  }
+
   get product(): ProductProps {
     return this.props.product
   }
 
   set product(prod: ProductProps) {
-    this.props.product = { ...prod }
+    this.props.product = prod
   }
 
   get quantity(): number {
@@ -35,7 +40,7 @@ export class InventoryItem {
     this.props.quantity = qtd
   }
 
-  edit({ product, quantity }: inventoryItemProps) {
-    this.props = { product, quantity }
+  edit({ productId, product, quantity }: inventoryItemProps) {
+    this.props = { productId, product, quantity }
   }
 }

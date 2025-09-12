@@ -1,8 +1,10 @@
 import { InventoryItem } from './inventoryItem'
 import { Entity } from 'src/modules/entity'
+import { InventoryOperation, OperationType } from './InventoryOperation'
 
 export interface InventoryProps {
   items: Map<string, InventoryItem>
+  operationHistory: InventoryOperation[]
 }
 
 export class Inventory extends Entity<InventoryProps> {
@@ -10,46 +12,96 @@ export class Inventory extends Entity<InventoryProps> {
     super(props, id)
   }
 
+  get operationHistory(): InventoryOperation[] {
+    return this.props.operationHistory
+  }
+
   get items(): Map<string, InventoryItem> {
     return this.props.items
   }
 
-  getItem(barcode: string): InventoryItem | null {
-    return this.props.items.get(barcode) ?? null
+  getItemById(productId: string): InventoryItem | null {
+    return this.props.items.get(productId) ?? null
   }
 
-  addItem(inventoryItem: InventoryItem) {
-    const existingItem: InventoryItem | undefined = this.props.items.get(
-      inventoryItem.product.barcode
+  addItems(inventoryItem: InventoryItem) {
+    const existingItem: InventoryItem | null = this.getItemById(
+      inventoryItem.productId
     )
 
-    if (!existingItem) {
-      return this.props.items.set(inventoryItem.product.barcode, inventoryItem)
+    let updatedQuantity = inventoryItem.quantity
+
+    if (updatedQuantity <= 0) {
+      throw new Error('A quantidade a ser adicionada deve ser maior que zero.')
     }
 
-    const updatedItem = new InventoryItem({
-      product: inventoryItem.product,
-      quantity: inventoryItem.quantity + existingItem.quantity,
+    if (existingItem) {
+      updatedQuantity += existingItem.quantity
+    }
+    // 1. Registra a operação de entrada
+    const operation = new InventoryOperation({
+      type: OperationType.ENTRADA,
+      productId: inventoryItem.productId,
+      quantity: inventoryItem.quantity,
+      date: new Date(),
     })
-    this.props.items.set(inventoryItem.product.barcode, updatedItem)
+
+    this.props.operationHistory.push(operation)
+
+    // 2. Cria o item no inventário (ou atualiza)
+    const itemToUpdate = new InventoryItem({
+      productId: inventoryItem.productId,
+      product: inventoryItem.product,
+      quantity: updatedQuantity,
+    })
+    this.props.items.set(inventoryItem.productId, itemToUpdate)
   }
 
-  editItem(originalItem: InventoryItem, updatedItem: InventoryItem) {
-    const originalBarcode = originalItem.product.barcode
-    const updatedBarcode = updatedItem.product.barcode
+  removeItems(productId: string, quantity: number) {
+    const existingItem = this.getItemById(productId)
 
-    if (originalBarcode === updatedBarcode) {
-      this.props.items.set(originalBarcode, updatedItem)
-    } else {
-      // We can just edit normally
-      this.deleteItem(originalItem)
-      this.props.items.set(updatedBarcode, updatedItem)
+    if (!existingItem) {
+      throw new Error('Item não foi encontrado no inventário.')
     }
 
-    this.props.items.set(updatedBarcode, updatedItem)
-  }
+    if (existingItem.quantity < quantity) {
+      throw new Error('Não temos produto suficiente em estoque.')
+    }
 
-  deleteItem(itemToRemove: InventoryItem) {
-    this.props.items.delete(itemToRemove.product.barcode)
+    const updatedQuantity = existingItem.quantity - quantity
+
+    if (updatedQuantity === 0) {
+      this.props.items.delete(productId)
+      // 1. Registra a operação de saída
+      const operation = new InventoryOperation({
+        type: OperationType.SAIDA,
+        productId: productId,
+        quantity: quantity,
+        date: new Date(),
+      })
+      this.props.operationHistory.push(operation)
+      return
+    }
+
+    if (updatedQuantity < 0) {
+      throw new Error('A quantidade a ser removida é maior que a disponível.')
+    }
+
+    // 1. Registra a operação de saída
+    const operation = new InventoryOperation({
+      type: OperationType.SAIDA,
+      productId: productId,
+      quantity: quantity,
+      date: new Date(),
+    })
+    this.props.operationHistory.push(operation)
+
+    // 2. Atualiza o item no inventário
+    const itemToUpdate = new InventoryItem({
+      productId: existingItem.productId,
+      product: existingItem.product,
+      quantity: updatedQuantity,
+    })
+    return this.props.items.set(productId, itemToUpdate)
   }
 }

@@ -6,6 +6,7 @@ export const makeInventory = (props: Partial<InventoryProps>, id?: string) => {
     {
       ...props,
       items: new Map<string, InventoryItem>(),
+      operationHistory: [],
     },
     id
   )
