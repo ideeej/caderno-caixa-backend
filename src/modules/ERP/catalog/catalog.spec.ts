@@ -1,83 +1,185 @@
-import { MeasuringUnit } from 'src/utils/measuringUnit'
+import { Catalog } from './catalog'
+import { Product } from '../product/product'
 import { makeProduct } from '../product/productFactory'
-import { makeCatalog } from './catalogFactory'
-import Decimal from 'decimal.js'
+import { makeCatalog } from './catalog.factory'
+import { MeasuringUnit } from 'src/utils/measuringUnit'
 import { PricingType } from 'src/utils/pricingType'
+import Decimal from 'decimal.js'
 
 describe('Domain Catalog', () => {
-  describe('Core', () => {
-    let testCatalog
+  let catalog: Catalog
+  let product1: Product
+  let product2: Product
 
-    beforeEach(() => {
-      testCatalog = makeCatalog({})
+  beforeEach(() => {
+    catalog = makeCatalog()
+
+    product1 = makeProduct({
+      barcode: '7894900010015',
+      name: 'Coca Cola Lata',
+      description: 'Refrigerante 350ml',
+      price: new Decimal('3.49'),
+      measuringUnit: MeasuringUnit.mililiter('350'),
+      pricingType: PricingType.UNITARY,
     })
 
-    test('Creates an empty catalog', () => {
-      expect(testCatalog.products).toEqual([])
+    product2 = makeProduct({
+      barcode: '7891910000197',
+      name: 'Guaraná Antarctica',
+      description: 'Refrigerante 350ml',
+      price: new Decimal('3.29'),
+      measuringUnit: MeasuringUnit.mililiter('350'),
+      pricingType: PricingType.UNITARY,
     })
   })
-  describe('Products', () => {
-    let testCatalog
 
-    beforeEach(() => {
-      testCatalog = makeCatalog({})
+  describe('Factory', () => {
+    test('should create empty catalog with factory', () => {
+      const emptyCatalog = makeCatalog()
+      expect(emptyCatalog.products).toHaveLength(0)
     })
 
-    test('AddProduct should add one product to the catalog.', () => {
-      const testProduct = makeProduct({})
+    test('should create catalog with initial products', () => {
+      const productsMap = new Map<string, Product>()
+      productsMap.set(product1.id, product1)
 
-      testCatalog.addProduct(testProduct)
-
-      expect(testCatalog.products).toEqual([testProduct])
+      const catalogWithProducts = makeCatalog({ products: productsMap })
+      expect(catalogWithProducts.products).toHaveLength(1)
+      expect(catalogWithProducts.getProduct(product1.id)).toEqual(product1)
     })
 
-    test('AddProducts should add more than one product to the catalog.', () => {
-      const products = [makeProduct({}), makeProduct({}), makeProduct({})]
+    test('should create catalog with custom id', () => {
+      const customId = 'custom-id-123'
+      const catalogWithId = makeCatalog({}, customId)
+      expect(catalogWithId.id).toBe(customId)
+    })
+  })
 
-      testCatalog.addProducts(products)
-
-      expect(testCatalog.products).toEqual([...products])
+  describe('Core Operations', () => {
+    test('should create an empty catalog', () => {
+      expect(catalog.products).toHaveLength(0)
     })
 
-    test('editProduct should edit one product from the catalog', () => {
-      const CocaLata = makeProduct({
-        barcode: '7894900010015',
-        name: 'Coca cola lata',
-        description: '',
-        price: Decimal('3.49'),
-        measuringUnit: MeasuringUnit.mililiter('350'),
-        pricingType: PricingType.UNITARY,
+    test('should add a product', () => {
+      catalog.addProduct(product1)
+      expect(catalog.products).toHaveLength(1)
+      expect(catalog.getProduct(product1.id)).toEqual(product1)
+    })
+
+    test('should add multiple products', () => {
+      catalog.addProducts([product1, product2])
+      expect(catalog.products).toHaveLength(2)
+    })
+
+    test('should not add duplicate product ID', () => {
+      catalog.addProduct(product1)
+      expect(() => catalog.addProduct(product1)).toThrow(
+        'Produto já existe no catálogo'
+      )
+    })
+
+    test('should not add duplicate barcode', () => {
+      catalog.addProduct(product1)
+      const duplicateBarcode = makeProduct({
+        ...product2.toProps(),
+        barcode: product1.barcode,
       })
+      expect(() => catalog.addProduct(duplicateBarcode)).toThrow(
+        'Já existe um produto com este código de barras'
+      )
+    })
+  })
 
-      const CocaPetProps = {
-        barcode: '7894900011609',
-        name: 'Coca cola pet 600ml',
-        description: '',
-        price: Decimal('6.99'),
-        measuringUnit: MeasuringUnit.mililiter('600'),
-        pricingType: PricingType.UNITARY,
+  describe('Search and Retrieval', () => {
+    beforeEach(() => {
+      catalog.addProducts([product1, product2])
+    })
+
+    test('should get product by ID', () => {
+      const found = catalog.getProduct(product1.id)
+      expect(found).toEqual(product1)
+    })
+
+    test('should get product by barcode', () => {
+      const found = catalog.getProductByBarcode(product1.barcode)
+      expect(found).toEqual(product1)
+    })
+
+    test('should search products by name', () => {
+      const results = catalog.searchProducts({ name: 'coca' })
+      expect(results).toHaveLength(1)
+      expect(results[0]).toEqual(product1)
+    })
+
+    test('should search products by price range', () => {
+      const results = catalog.searchProducts({
+        minPrice: new Decimal('3.00'),
+        maxPrice: new Decimal('3.30'),
+      })
+      expect(results).toHaveLength(1)
+      expect(results[0]).toEqual(product2)
+    })
+  })
+
+  describe('Product Management', () => {
+    test('should edit product', () => {
+      catalog.addProduct(product1)
+      const newProps = {
+        ...product1.toProps(),
+        price: new Decimal('3.99'),
+        description: 'Nova descrição',
       }
 
-      testCatalog.addProduct(CocaLata)
+      catalog.editProduct(product1.id, newProps)
+      const updated = catalog.getProduct(product1.id)
 
-      testCatalog.editProduct(CocaLata.id, CocaPetProps)
-
-      const testCocaPet = testCatalog.getProduct(CocaLata.id)
-
-      expect(testCocaPet.barcode).toBe(CocaPetProps.barcode)
-      expect(testCocaPet.name).toBe(CocaPetProps.name)
-      expect(testCocaPet.description).toBe(CocaPetProps.description)
-      expect(testCocaPet.price).toBe(CocaPetProps.price)
-      expect(testCocaPet.measuringUnit).toBe(CocaPetProps.measuringUnit)
-      expect(testCocaPet.pricingType).toBe(CocaPetProps.pricingType)
+      expect(updated?.price).toEqual(new Decimal('3.99'))
+      expect(updated?.description).toBe('Nova descrição')
     })
 
-    test('removeProduct should remove one product from the catalog.', () => {
-      const testProduct = makeProduct({})
+    test('should not edit product with duplicate barcode', () => {
+      catalog.addProducts([product1, product2])
+      const newProps = {
+        ...product2.toProps(),
+        barcode: product1.barcode,
+      }
 
-      testCatalog.addProduct(testProduct)
-      testCatalog.removeProduct(testProduct.id)
-      expect(testCatalog.products).toEqual([])
+      expect(() => catalog.editProduct(product2.id, newProps)).toThrow(
+        'Código de barras já está em uso'
+      )
+    })
+
+    test('should remove product', () => {
+      catalog.addProduct(product1)
+      catalog.removeProduct(product1.id)
+      expect(catalog.getProduct(product1.id)).toBeNull()
+    })
+  })
+
+  describe('Pagination', () => {
+    beforeEach(() => {
+      // Add 15 products for pagination testing
+      const products = Array.from({ length: 15 }, (_, i) =>
+        makeProduct({
+          barcode: `78949000100${i.toString().padStart(2, '0')}`,
+          name: `Product ${i + 1}`,
+          description: 'Test product',
+          price: new Decimal('1.99'),
+          measuringUnit: MeasuringUnit.unit('1'),
+          pricingType: PricingType.UNITARY,
+        })
+      )
+      catalog.addProducts(products)
+    })
+
+    test('should paginate products list', () => {
+      const page1 = catalog.listProducts(1, 10)
+      const page2 = catalog.listProducts(2, 10)
+
+      expect(page1.products).toHaveLength(10)
+      expect(page2.products).toHaveLength(5)
+      expect(page1.total).toBe(15)
+      expect(page2.total).toBe(15)
     })
   })
 })
