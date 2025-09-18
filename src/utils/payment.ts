@@ -13,17 +13,19 @@ export enum PaymentType {
 export interface PaymentProps {
   type: PaymentType
   amount: Decimal
+  createdAt?: Date
+  observation?: string
 }
 
 export class Payment {
   private _id: string
   public props: PaymentProps
 
-  constructor({ type, amount }: PaymentProps, id?: string) {
+  constructor(props: PaymentProps, id?: string) {
     this._id = id || randomUUID()
     this.props = {
-      type,
-      amount,
+      ...props,
+      createdAt: props.createdAt || new Date(),
     }
   }
 
@@ -37,5 +39,12 @@ export class Payment {
 
   get type(): PaymentType {
     return this.props.type
+  }
+
+  get createdAt(): Date {
+    return this.props.createdAt || new Date()
+  }
+  get observation(): string {
+    return this.props.observation || ''
   }
 }

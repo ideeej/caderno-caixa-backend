@@ -1,69 +1,167 @@
-# Ideias - Caderno Caixa
+# Caderno Caixa - Controle de Progresso
 
----
+## 🔧 Value Objects (src/utils)
 
-## 📌 Para a Primeira versão (V1)
+### CPF
 
-### 🏗️ Domínio
-- **Inventário**
-  - [X] Fazer movimentações (Entrada, Saída, Consumo)
-- **Cliente**
-  - [ ] Implementar entidade básica
-  - [ ] Criar factory e testes
-- **Fornecedor**
-  - [ ] Implementar entidade básica
-  - [ ] Criar factory e testes
-- **Vendas**
-  - [ ] Adicionar sistema de pagamento
-  - [ ] Integrar com inventário
-- **Relatórios**
-  - [ ] Relatório de vendas
-  - [ ] Relatório de estoque
-  - [ ] Relatório de caixa
+- [x] Validação de CPF
+- [x] Formatação automática
+- [ ] Testes unitários
 
-### 🛠️ Infraestrutura
-- **Database**
-  - [ ] Schema Prisma para Cliente
-  - [ ] Schema Prisma para Fornecedor
-  - [ ] Schema Prisma para Vendas
-  - [ ] Schema Prisma para Inventário
-- **Repositories**
-  - [ ] CatalogRepository
-  - [ ] InventoryRepository
-  - [ ] SaleRepository
-  - [ ] ClientRepository
-- **Mappers**
-  - [ ] Implementar mappers para cada entidade
+### CNPJ
 
-### 🌐 API
-- **Controllers**
-  - [ ] CatalogController
-  - [ ] InventoryController
-  - [ ] SaleController
-  - [ ] ClientController
-- **DTOs**
-  - [ ] DTOs de entrada/saída para cada módulo
-- **Validação**
-  - [ ] Middleware de validação
-  - [ ] Guards de autenticação
-  - [ ] Guards de autorização
+- [x] Validação de CNPJ
+- [x] Formatação automática
+- [ ] Testes unitários
 
-### 🧪 Testes
-- **Unitários**
-  - [ ] Testes para novas entidades
-  - [ ] Testes para use cases
-  - [ ] Testes para repositories
-- **Integração**
-  - [ ] Testes de repositories com Prisma
-  - [ ] Testes de controllers
-- **E2E**
-  - [ ] Fluxo básico de venda
-  - [ ] Fluxo de gestão de estoque
-  - [ ] Fluxo de relatórios
+### Email
 
-## 🚀 Ideias de Longo Prazo
+- [x] Validação de email
+- [x] Normalização (trim, lowercase)
+- [ ] Testes unitários
 
-- **NotaFiscal**
-  Acredito que vamos deixar notas fiscais pra um futuro não muito distante.
+### PhoneNumber
 
-## 💡 Ideias Aleatórias / Brainstorming
+- [x] Validação de telefone
+- [x] Formatação padrão
+- [ ] Testes unitários
+
+### Address
+
+- [x] Estrutura completa de endereço
+- [x] Validações básicas
+- [ ] Testes unitários
+
+### Payment
+
+- [x] Tipos de pagamento definidos
+- [x] Estrutura básica
+- [x] Integração com Sale
+- [ ] Testes unitários
+
+## 📦 ERP (src/modules/ERP)
+
+### Catalog
+
+- [x] Estrutura básica
+- [x] CRUD produtos
+- [x] Factory implementado
+- [x] Testes implementados
+- [ ] Repository
+- [ ] Use Cases
+
+### Inventory
+
+- [x] Estrutura básica
+- [x] Movimentações (Entrada/Saída)
+- [x] Factory implementado
+- [x] Testes implementados
+- [ ] Repository
+- [ ] Use Cases
+
+### Product
+
+- [x] Estrutura básica
+- [x] Factory implementado
+- [ ] Testes unitários
+
+### Client
+
+- [x] Estrutura básica
+- [x] Validações (CPF, Email, Phone)
+- [ ] Factory para testes
+- [ ] Testes unitários
+- [ ] Repository
+- [ ] Use Cases
+
+### Company
+
+- [x] Estrutura básica
+- [x] Validações (CNPJ, Email, Phone)
+- [ ] Factory para testes
+- [ ] Testes unitários
+- [ ] Repository
+- [ ] Use Cases
+
+### Supplier
+
+- [x] Estrutura básica
+- [x] Validações (CNPJ, Email, Phone)
+- [ ] Factory para testes
+- [ ] Testes unitários
+- [ ] Repository
+- [ ] Use Cases
+
+## 💰 PDV (src/modules/PDV)
+
+### CashRegister
+
+- [x] Estrutura básica
+- [x] Abertura/Fechamento
+- [x] Factory implementado
+- [x] Testes implementados
+- [x] Repository definido
+- [x] Use Cases implementados (open, close, deposit, withdraw)
+- [ ] Sangria
+- [ ] Suprimento
+
+### Operator
+
+- [x] Estrutura básica
+- [x] Factory implementado
+- [ ] Testes unitários
+
+### Sale
+
+- [x] Estrutura básica
+- [x] Estados da venda
+- [x] Adição/Remoção de itens
+- [x] Cálculo de totais
+- [x] Factory implementado
+- [x] Testes implementados
+- [ ] Cálculo de troco
+- [ ] Integração com Client
+- [ ] Integração com Inventory
+- [ ] Desconto por item
+- [ ] Desconto total
+- [ ] Repository
+- [ ] Use Cases
+
+## 🔄 Integrações Pendentes
+
+### Venda → Estoque
+
+- [ ] Baixa automática no estoque
+- [ ] Validação de disponibilidade
+- [ ] Estorno em cancelamento
+
+### Venda → Cliente
+
+- [ ] Vincular cliente à venda
+- [ ] Histórico de compras por cliente
+
+## 📊 Relatórios
+
+- [ ] Vendas do dia
+- [ ] Vendas por período
+- [ ] Produtos mais vendidos
+- [ ] Estoque atual
+- [ ] Produtos em baixa
+- [ ] Movimentações de caixa
+- [ ] Fechamento do dia
+
+## 🔐 Autenticação (já implementado)
+
+- [x] Módulo de autenticação
+- [x] Guards JWT
+- [x] Estratégias de autenticação
+- [x] Casos de uso de signin/validate
+- [x] Testes implementados
+
+## 🗄️ Infraestrutura
+
+- [x] Configuração Prisma
+- [x] Módulo de database
+- [ ] Schemas para novas entidades
+- [ ] Mappers para novas entidades
+- [ ] Repositories para novas entidades

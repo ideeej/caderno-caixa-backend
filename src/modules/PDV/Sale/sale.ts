@@ -1,6 +1,8 @@
 import Decimal from 'decimal.js'
 import { Entity } from 'src/modules/entity'
 import { SaleItem } from './saleItem'
+import { Client } from 'src/modules/ERP/Client/client'
+import { Payment } from 'src/utils/payment'
 
 export enum SaleState {
   CREATED = 'CREATED', // empty sale
@@ -13,6 +15,8 @@ export enum SaleState {
 export interface SaleProps {
   items: SaleItem[]
   state: SaleState
+  client?: Client | null
+  payments: Payment[]
   openedAt: Date
   closedAt: Date | null
   cancelledAt: Date | null
@@ -48,11 +52,31 @@ export class Sale extends Entity<SaleProps> {
     return this.props.items
   }
 
+  get payments(): Payment[] {
+    return this.props.payments
+  }
+
   get total(): Decimal {
     return this.props.items.reduce(
       (total, item) => total.plus(item.total),
       Decimal('0')
     )
+  }
+
+  get totalPaid(): Decimal {
+    return this.props.payments.reduce(
+      (total, payment) => total.plus(payment.amount),
+      Decimal('0')
+    )
+  }
+
+  get change(): Decimal {
+    const change = this.totalPaid.minus(this.total)
+    return change.isNegative() ? Decimal(0) : change
+  }
+
+  get isFullyPaid(): boolean {
+    return this.totalPaid.greaterThanOrEqualTo(this.total)
   }
 
   addItem(item: SaleItem) {
@@ -87,6 +111,20 @@ export class Sale extends Entity<SaleProps> {
 
     const indexToRemove = this.props.items.findIndex(item => item.id === id)
     return this.props.items.splice(indexToRemove, 1)
+  }
+
+  addPayment(payment: Payment) {
+    if (this.props.state !== SaleState.CLOSED) {
+      throw new Error(
+        'Não é possível adicionar pagamentos. A venda deve estar fechada para edição de pagamentos.'
+      )
+    }
+
+    this.props.payments.push(payment)
+
+    if (this.isFullyPaid) {
+      this.finish()
+    }
   }
 
   open() {
@@ -151,6 +189,12 @@ export class Sale extends Entity<SaleProps> {
     if (this.props.state !== SaleState.CLOSED) {
       throw new Error(
         'A venda só pode ser finalizada se estiver fechada para edição.'
+      )
+    }
+
+    if (!this.isFullyPaid) {
+      throw new Error(
+        'A venda só pode ser finalizada se o total pago for igual ou maior que o total da venda.'
       )
     }
 

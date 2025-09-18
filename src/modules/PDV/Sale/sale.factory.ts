@@ -5,6 +5,8 @@ export const NFID = 'NF_TEST_ID'
 export const TEST_SALE = {
   items: [],
   state: SaleState.CREATED,
+  client: null,
+  payments: [],
   openedAt: new Date(),
   closedAt: null,
   cancelledAt: null,
