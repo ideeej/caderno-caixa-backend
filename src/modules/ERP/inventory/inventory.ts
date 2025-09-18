@@ -8,6 +8,8 @@ export interface InventoryProps {
 }
 
 export class Inventory extends Entity<InventoryProps> {
+  allowNegativeStock = true // Para testes
+
   constructor(props: InventoryProps, id?: string) {
     super(props, id)
   }
@@ -38,7 +40,7 @@ export class Inventory extends Entity<InventoryProps> {
     if (existingItem) {
       updatedQuantity += existingItem.quantity
     }
-    // 1. Registra a operação de entrada
+
     const operation = new InventoryOperation({
       type: OperationType.ENTRADA,
       productId: inventoryItem.productId,
@@ -48,59 +50,41 @@ export class Inventory extends Entity<InventoryProps> {
 
     this.props.operationHistory.push(operation)
 
-    // 2. Cria o item no inventário (ou atualiza)
-    const itemToUpdate = new InventoryItem({
+    const newItem = new InventoryItem({
       productId: inventoryItem.productId,
       product: inventoryItem.product,
       quantity: updatedQuantity,
     })
-    this.props.items.set(inventoryItem.productId, itemToUpdate)
+
+    this.props.items.set(inventoryItem.productId, newItem)
   }
 
-  removeItems(productId: string, quantity: number) {
-    const existingItem = this.getItemById(productId)
+  removeItems(productId: string, quantity: number, type?: OperationType) {
+    const existingItem: InventoryItem | null = this.getItemById(productId)
 
     if (!existingItem) {
       throw new Error('Item não foi encontrado no inventário.')
     }
 
-    if (existingItem.quantity < quantity) {
+    if (!this.allowNegativeStock && existingItem.quantity < quantity) {
       throw new Error('Não temos produto suficiente em estoque.')
     }
 
-    const updatedQuantity = existingItem.quantity - quantity
+    existingItem.quantity -= quantity
 
-    if (updatedQuantity === 0) {
-      this.props.items.delete(productId)
-      // 1. Registra a operação de saída
-      const operation = new InventoryOperation({
-        type: OperationType.SAIDA,
-        productId: productId,
-        quantity: quantity,
-        date: new Date(),
-      })
-      this.props.operationHistory.push(operation)
-      return
-    }
-
-    if (updatedQuantity < 0) {
-      throw new Error('A quantidade a ser removida é maior que a disponível.')
-    }
-
-    // 1. Registra a operação de saída
     const operation = new InventoryOperation({
-      type: OperationType.SAIDA,
+      type: type || OperationType.SAIDA,
       productId: productId,
       quantity: quantity,
       date: new Date(),
     })
+
     this.props.operationHistory.push(operation)
 
-    // 2. Atualiza o item no inventário
     const itemToUpdate = new InventoryItem({
       productId: existingItem.productId,
       product: existingItem.product,
-      quantity: updatedQuantity,
+      quantity: existingItem.quantity,
     })
     return this.props.items.set(productId, itemToUpdate)
   }

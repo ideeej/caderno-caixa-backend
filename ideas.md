@@ -6,7 +6,7 @@
 
 ### 🏗️ Domínio
 - **Inventário**
-  - [ ] Fazer movimentações (Entrada, Saída, Consumo)
+  - [X] Fazer movimentações (Entrada, Saída, Consumo)
 - **Cliente**
   - [ ] Implementar entidade básica
   - [ ] Criar factory e testes

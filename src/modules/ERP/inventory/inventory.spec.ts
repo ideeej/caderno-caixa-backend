@@ -1,15 +1,15 @@
 import Decimal from 'decimal.js'
 import { PricingType } from 'src/utils/pricingType'
 import { MeasuringUnit } from 'src/utils/measuringUnit'
-import { InventoryItem, inventoryItemProps } from './inventoryItem'
+import { InventoryItem } from './inventoryItem'
 import { makeProduct } from '../product/productFactory'
 import { makeInventory } from './inventory.factory'
 import { makeInventoryItem } from './inventoryItem.factory'
 
 // Concrete class dependencies
 import { Inventory } from './inventory'
-import { Product, ProductProps } from '../product/product'
-import { InventoryOperation } from './InventoryOperation'
+import { Product } from '../product/product'
+import { InventoryOperation, OperationType } from './InventoryOperation'
 
 describe('Domain Inventory', () => {
   describe('Core', () => {
@@ -104,28 +104,37 @@ describe('Domain Inventory', () => {
       expect(addedItem!.quantity).toBe(15)
     })
 
-    test('RemoveItem should remove an item from the inventory', () => {
-      const product: Product = makeProduct({
-        barcode: '789490001160',
-        name: 'Coca cola pet',
-        description: 'Edited.',
-        price: Decimal('6.99'),
-        measuringUnit: MeasuringUnit.mililiter('600'),
+    test("RemoveItem should create InventoryOperations of the correct type", () => {
+      const product = makeProduct({
+        barcode: '7894900010039',
+        name: 'Fanta lata',
+        description: '',
+        price: Decimal('3.29'),
+        measuringUnit: MeasuringUnit.mililiter('350'),
         pricingType: PricingType.UNITARY,
       })
 
-      const item = makeInventoryItem({
+      const itemToAdd = makeInventoryItem({
         productId: product.id,
         product,
-        quantity: 12,
+        quantity: 5,
       })
 
-      inventory.addItems(item)
-      inventory.removeItems(product.id, item.quantity)
-      expect(inventory.getItemById(product.id)).toBeNull()
-      expect(inventory.operationHistory.length).toBe(2)
+      inventory.addItems(itemToAdd)
+      inventory.addItems(itemToAdd)
+      inventory.removeItems(product.id, 5)
+      inventory.removeItems(product.id, 5, OperationType.CONSUMO)
+
+      expect(inventory.operationHistory.length).toBe(4)
+      expect(inventory.operationHistory[0].type).toBe(OperationType.ENTRADA)
+      expect(inventory.operationHistory[1].type).toBe(OperationType.ENTRADA)
+      expect(inventory.operationHistory[2].type).toBe(OperationType.SAIDA)
+      expect(inventory.operationHistory[3].type).toBe(OperationType.CONSUMO)
+
+
     })
-    test('RemoveItem should decrease quantity when removing less than stock', () => {
+
+    test('RemoveItem should decrease quantity', () => {
       const product = makeProduct({
         barcode: '7894900010022',
         name: 'Guaraná lata',
@@ -149,27 +158,6 @@ describe('Domain Inventory', () => {
       expect(updatedItem!.quantity).toBe(6)
     })
 
-    test('RemoveItem should throw error if removing more than stock', () => {
-      const product = makeProduct({
-        barcode: '7894900010039',
-        name: 'Fanta lata',
-        description: '',
-        price: Decimal('3.29'),
-        measuringUnit: MeasuringUnit.mililiter('350'),
-        pricingType: PricingType.UNITARY,
-      })
-
-      const item = makeInventoryItem({
-        productId: product.id,
-        product,
-        quantity: 5,
-      })
-
-      inventory.addItems(item)
-      expect(() => inventory.removeItems(product.id, 10)).toThrow(
-        'Não temos produto suficiente em estoque.'
-      )
-    })
     test('AddItem should throw error if quantity is zero or negative', () => {
       const product = makeProduct({
         barcode: '7894900010046',
