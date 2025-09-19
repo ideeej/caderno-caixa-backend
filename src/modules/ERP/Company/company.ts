@@ -2,9 +2,10 @@ import { Entity } from 'src/modules/entity'
 import { Address } from 'src/utils/address'
 import { CNPJ } from 'src/utils/cnpj'
 import { Email } from 'src/utils/email'
+import { ICustomer, CustomerDocument } from 'src/utils/Icustomer'
 import { PhoneNumber } from 'src/utils/phoneNumber'
 
-interface CompanyProps {
+export interface CompanyProps {
   corporateName: string // Razão Social
   tradeName?: string // Nome Fantasia
   cnpj: CNPJ
@@ -17,7 +18,7 @@ interface CompanyProps {
   updatedAt: Date
 }
 
-export class Company extends Entity<CompanyProps> {
+export class Company extends Entity<CompanyProps> implements ICustomer {
   constructor(
     props: Omit<CompanyProps, 'createdAt' | 'updatedAt'>,
     id?: string
@@ -35,6 +36,14 @@ export class Company extends Entity<CompanyProps> {
       },
       id
     )
+  }
+
+  get name(): string {
+    return this.props.corporateName
+  }
+
+  get document(): CustomerDocument {
+    return this.props.cnpj
   }
 
   // Getters

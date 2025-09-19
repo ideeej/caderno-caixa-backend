@@ -18,6 +18,7 @@ export const makeSale = (props: Partial<SaleProps>, id?: string) => {
     {
       ...TEST_SALE,
       items: [...TEST_SALE.items],
+      payments: [...TEST_SALE.payments],
       ...props,
     },
     id ?? NFID

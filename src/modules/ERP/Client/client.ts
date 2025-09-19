@@ -2,9 +2,10 @@ import { Entity } from 'src/modules/entity'
 import { Address } from 'src/utils/address'
 import { CPF } from 'src/utils/cpf'
 import { Email } from 'src/utils/email'
+import { ICustomer } from 'src/utils/Icustomer'
 import { PhoneNumber } from 'src/utils/phoneNumber'
 
-interface ClientProps {
+export interface ClientProps {
   name: string
   cpf: CPF
   email?: Email
@@ -16,7 +17,7 @@ interface ClientProps {
   updatedAt: Date
 }
 
-export class Client extends Entity<ClientProps> {
+export class Client extends Entity<ClientProps> implements ICustomer {
   constructor(
     props: Omit<ClientProps, 'createdAt' | 'updatedAt'>,
     id?: string

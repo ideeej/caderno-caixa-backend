@@ -19,6 +19,70 @@ export class Address {
     this.props = props
   }
 
+  get street(): string {
+    return this.props.street
+  }
+
+  get number(): string {
+    return this.props.number
+  }
+
+  get neighborhood(): string {
+    return this.props.neighborhood
+  }
+
+  get city(): string {
+    return this.props.city
+  }
+
+  get state(): string {
+    return this.props.state
+  }
+
+  get zip(): string {
+    return this.props.zip
+  }
+
+  get country(): string {
+    return this.props.country
+  }
+
+  get complement(): string | undefined {
+    return this.props.complement
+  }
+
+  set complement(value: string | undefined) {
+    this.props.complement = value
+  }
+
+  set country(value: string) {
+    this.props.country = value
+  }
+
+  set zip(value: string) {
+    this.props.zip = value
+  }
+
+  set state(value: string) {
+    this.props.state = value
+  }
+
+  set city(value: string) {
+    this.props.city = value
+  }
+
+  set neighborhood(value: string) {
+    this.props.neighborhood = value
+  }
+
+  set number(value: string) {
+    this.props.number = value
+  }
+
+  set street(value: string) {
+    this.props.street = value
+  }
+
   static validate(props: AddressProps): boolean {
     return (
       !!props.street &&

@@ -63,6 +63,15 @@
 
 - [x] Estrutura básica
 - [x] Factory implementado
+- [ ] Repository
+- [ ] Use Cases
+- [ ] Testes unitários?
+
+### Operator
+
+- [x] Estrutura básica
+- [x] Factory implementado
+- [ ] Factory para testes
 - [ ] Testes unitários
 
 ### Client
@@ -102,14 +111,7 @@
 - [x] Testes implementados
 - [x] Repository definido
 - [x] Use Cases implementados (open, close, deposit, withdraw)
-- [ ] Sangria
-- [ ] Suprimento
-
-### Operator
-
-- [x] Estrutura básica
-- [x] Factory implementado
-- [ ] Testes unitários
+- [ ] Revisão
 
 ### Sale
 
@@ -119,9 +121,8 @@
 - [x] Cálculo de totais
 - [x] Factory implementado
 - [x] Testes implementados
-- [ ] Cálculo de troco
-- [ ] Integração com Client
-- [ ] Integração com Inventory
+- [x] Cálculo de troco
+- [x] Customer vinculado à venda (Client ou Company ou null)
 - [ ] Desconto por item
 - [ ] Desconto total
 - [ ] Repository
@@ -137,7 +138,7 @@
 
 ### Venda → Cliente
 
-- [ ] Vincular cliente à venda
+- [x] Vincular cliente à venda
 - [ ] Histórico de compras por cliente
 
 ## 📊 Relatórios
@@ -164,4 +165,4 @@
 - [x] Módulo de database
 - [ ] Schemas para novas entidades
 - [ ] Mappers para novas entidades
-- [ ] Repositories para novas entidades
+- [WIP] Repositories para novas entidades

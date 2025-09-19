@@ -1,8 +1,8 @@
 import Decimal from 'decimal.js'
 import { Entity } from 'src/modules/entity'
 import { SaleItem } from './saleItem'
-import { Client } from 'src/modules/ERP/Client/client'
 import { Payment } from 'src/utils/payment'
+import { ICustomer } from 'src/utils/Icustomer'
 
 export enum SaleState {
   CREATED = 'CREATED', // empty sale
@@ -15,7 +15,7 @@ export enum SaleState {
 export interface SaleProps {
   items: SaleItem[]
   state: SaleState
-  client?: Client | null
+  customer?: ICustomer | null
   payments: Payment[]
   openedAt: Date
   closedAt: Date | null
@@ -26,6 +26,10 @@ export interface SaleProps {
 export class Sale extends Entity<SaleProps> {
   constructor(props: SaleProps, id?: string) {
     super(props, id)
+  }
+
+  get customer(): ICustomer | null {
+    return this.props.customer ?? null
   }
 
   get state(): SaleState {
@@ -76,10 +80,20 @@ export class Sale extends Entity<SaleProps> {
   }
 
   get isFullyPaid(): boolean {
-    return this.totalPaid.greaterThanOrEqualTo(this.total)
+    const isPaid = this.totalPaid.greaterThanOrEqualTo(this.total)
+    const hasItems = this.items.length > 0
+    return isPaid && hasItems
+  }
+
+  assignCustomer(customer: ICustomer) {
+    this.props.customer = customer
   }
 
   addItem(item: SaleItem) {
+    if (item.quantity.lessThanOrEqualTo(Decimal('0'))) {
+      throw new Error('Quantidade deve ser maior que zero')
+    }
+
     if (this.props.state === SaleState.CREATED) {
       this.open()
     }
@@ -122,9 +136,26 @@ export class Sale extends Entity<SaleProps> {
 
     this.props.payments.push(payment)
 
-    if (this.isFullyPaid) {
-      this.finish()
+    // This finishes the sale automatically if fully paid
+    // Want to be able to switch this on and off later
+    // if (this.isFullyPaid) {
+    //   this.finish()
+    // }
+  }
+
+  removePayment(id: string): void {
+    if (this.props.state !== SaleState.CLOSED) {
+      throw new Error(
+        'Não é possível remover pagamentos. A venda deve estar fechada para edição de pagamentos.'
+      )
     }
+
+    const paymentToRemove = this.props.payments.findIndex(p => p.id === id)
+
+    if (paymentToRemove === -1) {
+      throw new Error('Pagamento não encontrado.')
+    }
+    this.props.payments.splice(paymentToRemove, 1)
   }
 
   open() {
@@ -144,6 +175,16 @@ export class Sale extends Entity<SaleProps> {
 
     this.props.state = SaleState.OPEN
     this.props.openedAt = new Date()
+  }
+
+  reopen(): void {
+    if (this.state !== SaleState.CLOSED) {
+      throw new Error('Apenas vendas fechadas podem ser reabertas')
+    }
+    if (this.payments.length > 0) {
+      throw new Error('Vendas com pagamentos não podem ser reabertas')
+    }
+    this.props.state = SaleState.OPEN
   }
 
   close() {
