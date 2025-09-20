@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common'
-import { CreateUserUseCase } from 'src/modules/auth/user/useCases/CreateUserUseCase/CreateUserUseCase'
+import { CreateUserUseCase } from 'src/modules/auth/user/useCases/CreateUserUseCase/CreateUser.usecase'
 import { CreateUserBody } from './dtos/CreateUserBody'
 import { UserViewModel } from './viewModel/userViewModel'
 import { Public } from '../auth/decorators/isPublic'
