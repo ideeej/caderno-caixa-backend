@@ -13,7 +13,7 @@ describe('SALE TESTS', () => {
     sale = makeSale({})
   })
 
-  test('SALE Test Creation with Client and Company', () => {
+  test('SALE Test Creation', () => {
     expect(sale.items).toEqual([])
     expect(sale.state).toBe(SaleState.CREATED)
     expect(sale.closedAt).toBeNull()
