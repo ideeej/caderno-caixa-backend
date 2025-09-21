@@ -1,27 +1,15 @@
-import { randomUUID } from 'crypto'
-import { Replace } from 'src/utils/Replace'
+import { Entity } from 'src/modules/entity'
 
-interface UserSchema {
+interface UserProps {
   email: string
   password: string
   name: string
   createdAt: Date
 }
 
-export class User {
-  private props: UserSchema
-  private _id: string
-
-  constructor(props: Replace<UserSchema, { createdAt?: Date }>, id?: string) {
-    this.props = {
-      ...props,
-      createdAt: props.createdAt || new Date(),
-    }
-    this._id = id || randomUUID()
-  }
-
-  get id() {
-    return this._id
+export class User extends Entity<UserProps> {
+  constructor(props: UserProps, id?: string) {
+    super(props, id)
   }
 
   get email() {

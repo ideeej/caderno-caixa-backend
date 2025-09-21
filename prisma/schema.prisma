@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -16,6 +16,7 @@ model User {
   password String
   createdAt DateTime
   cashRegister CashRegister[]
+  sales Sale[]
 }
 
 model CashRegister {
@@ -31,5 +32,27 @@ model CashRegister {
   initialAmount Int
   closingAmount Int?
   isOpen Boolean
+  sales Sale[]
 
+}
+
+model Sale {
+  @@map("Sales")
+
+  id String @id @default(uuid())
+
+  userId         String
+  user           User           @relation(fields: [userId], references: [id])
+  cashRegisterId String
+  cashRegister   CashRegister   @relation(fields: [cashRegisterId], references: [id])
+
+  openedAt    DateTime
+  closedAt    DateTime?
+  cancelledAt DateTime?
+  finishedAt  DateTime?
+
+  items    Json[]    // Representa o SaleItem[] do seu domínio
+  state    String
+  customer Json?     // Representa o ICustomer
+  payments Json[]    // Representa o Payment[]
 }

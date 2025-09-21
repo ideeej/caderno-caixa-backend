@@ -18,6 +18,7 @@ export class CreateUserUseCase {
       email,
       name,
       password: await hash(password, 10),
+      createdAt: new Date(),
     })
 
     await this.userRepository.create(user)

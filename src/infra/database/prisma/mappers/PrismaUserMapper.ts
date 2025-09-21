@@ -1,5 +1,5 @@
 import { User } from 'src/modules/auth/user/entities/User'
-import { Prisma, User as PrismaUser } from '@prisma/client'
+import { User as PrismaUser } from '@prisma/client'
 
 export class PrismaUserMapper {
   static toPrismaUser({
