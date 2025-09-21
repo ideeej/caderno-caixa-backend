@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto'
 import Decimal from 'decimal.js'
+import { Money } from '../Money/Money'
 
 export enum PaymentType {
   CASH = 'cash',
@@ -12,7 +13,7 @@ export enum PaymentType {
 
 export interface PaymentProps {
   type: PaymentType
-  amount: Decimal
+  amount: Money
   createdAt?: Date
   observation?: string
 }
@@ -33,7 +34,7 @@ export class Payment {
     return this._id
   }
 
-  get amount(): Decimal {
+  get amount(): Money {
     return this.props.amount
   }
 

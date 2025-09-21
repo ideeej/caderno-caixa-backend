@@ -1,7 +1,7 @@
 import { Entity } from 'src/modules/entity'
-import { Address } from 'src/utils/Address'
-import { Email } from 'src/utils/Email'
-import { PhoneNumber } from 'src/utils/PhoneNumber'
+import { Address } from 'src/modules/ERP/Address/Address'
+import { Email } from 'src/modules/ERP/Email/Email'
+import { PhoneNumber } from 'src/modules/ERP/PhoneNumber/PhoneNumber'
 
 interface SupplierProps {
   corporateName: string

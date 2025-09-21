@@ -1,11 +1,11 @@
-import Decimal from 'decimal.js'
 import { Entity } from 'src/modules/entity'
+import { Money } from 'src/modules/ERP/Money/Money'
 import { ProductProps } from 'src/modules/ERP/Product/Product'
 
 export interface SaleItemProps {
   productInfo: ProductProps
-  quantity: Decimal
-  total: Decimal
+  quantity: number
+  total: Money
 }
 
 export class SaleItem extends Entity<SaleItemProps> {
@@ -18,15 +18,15 @@ export class SaleItem extends Entity<SaleItemProps> {
     return this.props.productInfo
   }
 
-  get quantity(): Decimal {
+  get quantity(): number {
     return this.props.quantity
   }
 
-  get total(): Decimal {
-    return this.props.productInfo.price.times(this.props.quantity)
+  get total(): Money {
+    return this.updateTotal()
   }
 
-  updateTotal() {
-    this.props.total = this.props.productInfo.price.times(this.props.quantity)
+  updateTotal(): Money {
+    return this.props.productInfo.price.multiply(this.props.quantity)
   }
 }

@@ -1,18 +1,18 @@
+import { Money } from 'src/modules/ERP/Money/Money'
 import {
   CashRegister,
   CashRegisterProps,
   CashRegisterState,
 } from './CashRegister'
 import { Balance } from 'src/utils/Balance'
-import Decimal from 'decimal.js'
 
 const defaultBalance: Balance = {
-  cash: Decimal('0'),
-  debit: Decimal('0'),
-  credit: Decimal('0'),
-  pix: Decimal('0'),
-  check: Decimal('0'),
-  onAccount: Decimal('0'),
+  cash: new Money('0'),
+  debit: new Money('0'),
+  credit: new Money('0'),
+  pix: new Money('0'),
+  check: new Money('0'),
+  onAccount: new Money('0'),
 }
 
 const defaultOperatorId = 'default_operator'

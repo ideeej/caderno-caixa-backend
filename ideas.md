@@ -41,6 +41,18 @@
 
 ## 📦 ERP (src/modules/ERP)
 
+### Product
+
+- [x] Estrutura básica
+- [x] Factory implementado
+- [x] Refatorar Product para usar as classes Money e Barcode
+- [ ] Testes unitários
+- [ ] Use Cases
+- [ ] Registrar um produto
+- [ ] criar testes para o caso de uso RegisterProduct
+- [ ] Verificar unicidade do código de barras no usecase
+- [ ] Repository
+
 ### Catalog
 
 - [x] Estrutura básica
@@ -58,14 +70,6 @@
 - [x] Testes implementados
 - [ ] Repository
 - [ ] Use Cases
-
-### Product
-
-- [x] Estrutura básica
-- [x] Factory implementado
-- [ ] Repository
-- [ ] Use Cases
-- [ ] Testes unitários?
 
 ### Operator
 

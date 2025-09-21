@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import { CashRegisterRepository } from '../../repositories/CashRegister.repository'
 import { CashRegister, CashRegisterState } from '../../CashRegister'
-import Decimal from 'decimal.js'
+import { Money } from 'src/modules/ERP/Money/Money'
 
 interface OpenCashRegisterRequest {
-  amount: Decimal
+  amount: Money
   operatorId: string
 }
 
@@ -25,7 +25,7 @@ export class OpenCashRegister {
       )
     }
 
-    if (amount.lt(Decimal('0'))) {
+    if (amount.isLessThan(0)) {
       throw new Error(
         '[USECASE] OpenCashRegister: The initial quantity for the cash register cannot be negative.'
       )

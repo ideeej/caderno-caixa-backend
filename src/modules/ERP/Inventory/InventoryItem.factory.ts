@@ -1,16 +1,17 @@
 import { PricingType } from 'src/utils/PricingType'
 import { Product } from '../Product/Product'
 import { InventoryItem, InventoryItemProps } from './InventoryItem'
-import Decimal from 'decimal.js'
-import { MeasuringUnit } from 'src/utils/MeasuringUnit'
+import { MeasuringUnit } from 'src/modules/ERP/MeasuringUnit/MeasuringUnit'
 import { makeProduct } from '../Product/Product.factory'
+import { Barcode } from '../Barcode/Barcode'
+import { Money } from '../Money/Money'
 
 const cocaLata: Product = makeProduct({
-  barcode: '7894900010015',
+  barcode: new Barcode('7894900010015'),
   name: '_Coca cola lata',
   description: '',
-  price: Decimal('3.49'),
-  measuringUnit: MeasuringUnit.mililiter('350'),
+  price: new Money('3.49'),
+  measure: MeasuringUnit.mililiter('350'),
   pricingType: PricingType.UNITARY,
 })
 

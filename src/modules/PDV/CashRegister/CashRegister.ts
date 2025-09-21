@@ -1,7 +1,8 @@
 import { randomUUID } from 'crypto'
 import { Balance } from 'src/utils/Balance'
-import { PaymentProps } from 'src/utils/Payment'
+import { PaymentProps } from 'src/modules/ERP/Payment/Payment'
 import Decimal from 'decimal.js'
+import { Money } from 'src/modules/ERP/Money/Money'
 
 export enum CashRegisterState {
   OPEN,
@@ -14,7 +15,7 @@ export interface CashRegisterProps {
   operatorId: string
   openedAt: Date
   closedAt: Date | null
-  declaredCashClose: Decimal | null
+  declaredCashClose: Money | null
 }
 
 export class CashRegister {
@@ -55,11 +56,11 @@ export class CashRegister {
     return this.props.closedAt
   }
 
-  get declaredCashClose(): Decimal | null {
+  get declaredCashClose(): Money | null {
     return this.props.declaredCashClose
   }
 
-  public close(amount: Decimal) {
+  public close(amount: Money) {
     if (this.props.state === CashRegisterState.CLOSED) {
       throw new Error('[CASH REGISTER] Close: O Caixa já está fechado.')
     }
@@ -75,8 +76,8 @@ export class CashRegister {
         '[CASH REGISTER] Deposit: Não foi possível efetuar o depósito. O caixa já está fechado.'
       )
     }
-    this.props.balance[payment.type] = this.props.balance[payment.type]!.plus(
-      payment.amount
+    this.props.balance[payment.type] = this.props.balance[payment.type]!.add(
+      payment.amount.value
     )
   }
 
@@ -87,7 +88,9 @@ export class CashRegister {
       )
     }
 
-    if (this.props.balance[transaction.type]!.lt(transaction.amount)) {
+    if (
+      this.props.balance[transaction.type]!.isLessThan(transaction.amount.value)
+    ) {
       throw new Error(
         '[CASH REGISTER] Withdraw: Não foi possível efetuar o saque. Balanço insuficiente.'
       )
@@ -95,6 +98,6 @@ export class CashRegister {
 
     this.props.balance[transaction.type] = this.props.balance[
       transaction.type
-    ]!.minus(transaction.amount)
+    ]!.subtract(transaction.amount.value)
   }
 }

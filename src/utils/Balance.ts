@@ -1,10 +1,10 @@
-import Decimal from 'decimal.js'
+import { Money } from 'src/modules/ERP/Money/Money'
 
 export interface Balance {
-  cash: Decimal
-  debit?: Decimal
-  credit?: Decimal
-  pix?: Decimal
-  check?: Decimal
-  onAccount?: Decimal
+  cash: Money
+  debit?: Money
+  credit?: Money
+  pix?: Money
+  check?: Money
+  onAccount?: Money
 }

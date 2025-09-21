@@ -1,5 +1,5 @@
 import { Client, ClientProps } from './Client'
-import { CPF } from 'src/utils/CPF'
+import { CPF } from 'src/modules/ERP/CPF/CPF'
 
 export const CLIENT_ID = 'CLIENT_TEST_ID'
 

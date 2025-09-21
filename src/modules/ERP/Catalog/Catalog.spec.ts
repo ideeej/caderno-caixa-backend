@@ -2,9 +2,10 @@ import { Catalog } from './Catalog'
 import { Product } from '../Product/Product'
 import { makeProduct } from '../Product/Product.factory'
 import { makeCatalog } from './Catalog.factory'
-import { MeasuringUnit } from 'src/utils/MeasuringUnit'
+import { MeasuringUnit } from 'src/modules/ERP/MeasuringUnit/MeasuringUnit'
 import { PricingType } from 'src/utils/PricingType'
-import Decimal from 'decimal.js'
+import { Barcode, generateValidEAN13 } from '../Barcode/Barcode'
+import { Money } from '../Money/Money'
 
 describe('Domain Catalog', () => {
   let catalog: Catalog
@@ -15,20 +16,20 @@ describe('Domain Catalog', () => {
     catalog = makeCatalog()
 
     product1 = makeProduct({
-      barcode: '7894900010015',
+      barcode: new Barcode('7894900010015'),
       name: 'Coca Cola Lata',
       description: 'Refrigerante 350ml',
-      price: new Decimal('3.49'),
-      measuringUnit: MeasuringUnit.mililiter('350'),
+      price: new Money('3.49'),
+      measure: MeasuringUnit.mililiter('350'),
       pricingType: PricingType.UNITARY,
     })
 
     product2 = makeProduct({
-      barcode: '7891910000197',
+      barcode: new Barcode('7891910000197'),
       name: 'Guaraná Antarctica',
       description: 'Refrigerante 350ml',
-      price: new Decimal('3.29'),
-      measuringUnit: MeasuringUnit.mililiter('350'),
+      price: new Money('3.29'),
+      measure: MeasuringUnit.mililiter('350'),
       pricingType: PricingType.UNITARY,
     })
   })
@@ -101,7 +102,7 @@ describe('Domain Catalog', () => {
     })
 
     test('should get product by barcode', () => {
-      const found = catalog.getProductByBarcode(product1.barcode)
+      const found = catalog.getProductByBarcode(product1.barcode.value)
       expect(found).toEqual(product1)
     })
 
@@ -113,8 +114,8 @@ describe('Domain Catalog', () => {
 
     test('should search products by price range', () => {
       const results = catalog.searchProducts({
-        minPrice: new Decimal('3.00'),
-        maxPrice: new Decimal('3.30'),
+        minPrice: '3.00',
+        maxPrice: '3.30',
       })
       expect(results).toHaveLength(1)
       expect(results[0]).toEqual(product2)
@@ -126,14 +127,14 @@ describe('Domain Catalog', () => {
       catalog.addProduct(product1)
       const newProps = {
         ...product1.toProps(),
-        price: new Decimal('3.99'),
+        price: new Money('3.99'),
         description: 'Nova descrição',
       }
 
       catalog.editProduct(product1.id, newProps)
       const updated = catalog.getProduct(product1.id)
 
-      expect(updated?.price).toEqual(new Decimal('3.99'))
+      expect(updated?.price).toEqual(new Money('3.99'))
       expect(updated?.description).toBe('Nova descrição')
     })
 
@@ -159,16 +160,18 @@ describe('Domain Catalog', () => {
   describe('Pagination', () => {
     beforeEach(() => {
       // Add 15 products for pagination testing
-      const products = Array.from({ length: 15 }, (_, i) =>
-        makeProduct({
-          barcode: `78949000100${i.toString().padStart(2, '0')}`,
+      const products = Array.from({ length: 15 }, (_, i) => {
+        const baseBarcode = `789490000${i.toString().padStart(3, '0')}`
+        const validBarcode = generateValidEAN13(baseBarcode)
+        return makeProduct({
+          barcode: new Barcode(validBarcode),
           name: `Product ${i + 1}`,
           description: 'Test product',
-          price: new Decimal('1.99'),
-          measuringUnit: MeasuringUnit.unit('1'),
+          price: new Money('1.99'),
+          measure: MeasuringUnit.unit('1'),
           pricingType: PricingType.UNITARY,
         })
-      )
+      })
       catalog.addProducts(products)
     })
 

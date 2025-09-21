@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js'
 import { PricingType } from 'src/utils/PricingType'
-import { MeasuringUnit } from 'src/utils/MeasuringUnit'
+import { MeasuringUnit } from 'src/modules/ERP/MeasuringUnit/MeasuringUnit'
 import { InventoryItem } from './InventoryItem'
 import { makeProduct } from '../Product/Product.factory'
 import { makeInventory } from './Inventory.factory'
@@ -9,6 +9,8 @@ import { makeInventoryItem } from './InventoryItem.factory'
 // Concrete class dependencies
 import { Inventory } from './Inventory'
 import { InventoryOperation, OperationType } from './InventoryOperation'
+import { Money } from '../Money/Money'
+import { Barcode } from '../Barcode/Barcode'
 
 describe('Domain Inventory', () => {
   describe('Core', () => {
@@ -23,11 +25,11 @@ describe('Domain Inventory', () => {
 
     test('Additem should add InventoryItems correctly', () => {
       const product = makeProduct({
-        barcode: '7894900010015',
+        barcode: new Barcode('7894900010015'),
         name: 'Coca cola lata',
         description: '',
-        price: Decimal('3.49'),
-        measuringUnit: MeasuringUnit.mililiter('350'),
+        price: new Money('3.49'),
+        measure: MeasuringUnit.mililiter('350'),
         pricingType: PricingType.UNITARY,
       })
 
@@ -46,11 +48,11 @@ describe('Domain Inventory', () => {
 
     test('Additem should create an InventoryOperation of type ENTRADA', () => {
       const product = makeProduct({
-        barcode: '7894900010015',
+        barcode: new Barcode('7894900010015'),
         name: 'Coca cola lata',
         description: '',
-        price: Decimal('3.49'),
-        measuringUnit: MeasuringUnit.mililiter('350'),
+        price: new Money('3.49'),
+        measure: MeasuringUnit.mililiter('350'),
         pricingType: PricingType.UNITARY,
       })
 
@@ -73,11 +75,11 @@ describe('Domain Inventory', () => {
     test('AddItem should add quantities when item exist', () => {
       const products = [
         makeProduct({
-          barcode: '7894900010015',
+          barcode: new Barcode('7894900010015'),
           name: 'Coca cola lata',
           description: '',
-          price: Decimal('3.49'),
-          measuringUnit: MeasuringUnit.mililiter('350'),
+          price: new Money('3.49'),
+          measure: MeasuringUnit.mililiter('350'),
           pricingType: PricingType.UNITARY,
         }),
       ]
@@ -105,11 +107,11 @@ describe('Domain Inventory', () => {
 
     test('RemoveItem should create InventoryOperations of the correct type', () => {
       const product = makeProduct({
-        barcode: '7894900010039',
+        barcode: new Barcode('7894900010039'),
         name: 'Fanta lata',
         description: '',
-        price: Decimal('3.29'),
-        measuringUnit: MeasuringUnit.mililiter('350'),
+        price: new Money('3.29'),
+        measure: MeasuringUnit.mililiter('350'),
         pricingType: PricingType.UNITARY,
       })
 
@@ -133,11 +135,11 @@ describe('Domain Inventory', () => {
 
     test('RemoveItem should decrease quantity', () => {
       const product = makeProduct({
-        barcode: '7894900010022',
+        barcode: new Barcode('7894900010022'),
         name: 'Guaraná lata',
         description: '',
-        price: Decimal('3.19'),
-        measuringUnit: MeasuringUnit.mililiter('350'),
+        price: new Money('3.19'),
+        measure: MeasuringUnit.mililiter('350'),
         pricingType: PricingType.UNITARY,
       })
 
@@ -157,11 +159,11 @@ describe('Domain Inventory', () => {
 
     test('AddItem should throw error if quantity is zero or negative', () => {
       const product = makeProduct({
-        barcode: '7894900010046',
+        barcode: new Barcode('7894900010046'),
         name: 'Sprite lata',
         description: '',
-        price: Decimal('3.39'),
-        measuringUnit: MeasuringUnit.mililiter('350'),
+        price: new Money('3.39'),
+        measure: MeasuringUnit.mililiter('350'),
         pricingType: PricingType.UNITARY,
       })
 

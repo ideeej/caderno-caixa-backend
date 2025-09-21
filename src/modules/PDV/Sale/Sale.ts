@@ -1,8 +1,8 @@
-import Decimal from 'decimal.js'
 import { Entity } from 'src/modules/entity'
 import { SaleItem } from './SaleItem'
-import { Payment } from 'src/utils/Payment'
+import { Payment } from 'src/modules/ERP/Payment/Payment'
 import { ICustomer } from 'src/utils/ICustomer'
+import { Money } from 'src/modules/ERP/Money/Money'
 
 export enum SaleState {
   CREATED = 'CREATED', // empty sale
@@ -60,27 +60,32 @@ export class Sale extends Entity<SaleProps> {
     return this.props.payments
   }
 
-  get total(): Decimal {
+  get total(): Money {
     return this.props.items.reduce(
-      (total, item) => total.plus(item.total),
-      Decimal('0')
+      (total, item) => total.add(item.total.value),
+      new Money('0')
     )
   }
 
-  get totalPaid(): Decimal {
+  get totalPaid(): Money {
     return this.props.payments.reduce(
-      (total, payment) => total.plus(payment.amount),
-      Decimal('0')
+      (total, payment) => total.add(payment.amount.value),
+      new Money('0')
     )
   }
 
-  get change(): Decimal {
-    const change = this.totalPaid.minus(this.total)
-    return change.isNegative() ? Decimal(0) : change
+  get change(): Money {
+    const calculatedChange = this.totalPaid.value.minus(this.total.value)
+
+    if (calculatedChange.lessThan(0)) {
+      return new Money('0')
+    } else {
+      return new Money(calculatedChange.toString())
+    }
   }
 
   get isFullyPaid(): boolean {
-    const isPaid = this.totalPaid.greaterThanOrEqualTo(this.total)
+    const isPaid = this.totalPaid.isGreaterThan(this.total.value)
     const hasItems = this.items.length > 0
     return isPaid && hasItems
   }
@@ -90,7 +95,7 @@ export class Sale extends Entity<SaleProps> {
   }
 
   addItem(item: SaleItem) {
-    if (item.quantity.lessThanOrEqualTo(Decimal('0'))) {
+    if (item.quantity <= 0) {
       throw new Error('Quantidade deve ser maior que zero')
     }
 

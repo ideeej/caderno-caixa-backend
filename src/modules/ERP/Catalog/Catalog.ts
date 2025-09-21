@@ -8,8 +8,8 @@ export interface CatalogProps {
 
 interface ProductSearch {
   name?: string
-  minPrice?: Decimal
-  maxPrice?: Decimal
+  minPrice?: Decimal.Value
+  maxPrice?: Decimal.Value
   barcode?: string
 }
 
@@ -33,8 +33,8 @@ export class Catalog extends Entity<CatalogProps> {
 
   getProductByBarcode(barcode: string): Product | null {
     return (
-      Array.from(this.props.products.values()).find(
-        product => product.barcode === barcode
+      Array.from(this.props.products.values()).find(product =>
+        product.barcode.checkBarcode(barcode)
       ) ?? null
     )
   }
@@ -44,7 +44,7 @@ export class Catalog extends Entity<CatalogProps> {
       throw new Error('Produto já existe no catálogo')
     }
 
-    if (this.getProductByBarcode(newProd.barcode)) {
+    if (this.getProductByBarcode(newProd.barcode.value)) {
       throw new Error('Já existe um produto com este código de barras')
     }
     this.props.products.set(newProd.id, newProd)
@@ -61,7 +61,7 @@ export class Catalog extends Entity<CatalogProps> {
     }
     // Verifica se o código de barras já existe em outro produto
     if (editProps.barcode !== product.barcode) {
-      const existingProduct = this.getProductByBarcode(editProps.barcode)
+      const existingProduct = this.getProductByBarcode(editProps.barcode.value)
       if (existingProduct) {
         throw new Error('Código de barras já está em uso')
       }
@@ -84,13 +84,13 @@ export class Catalog extends Entity<CatalogProps> {
       ) {
         return false
       }
-      if (query.barcode && product.barcode !== query.barcode) {
+      if (query.barcode && product.barcode.checkBarcode(query.barcode)) {
         return false
       }
-      if (query.minPrice && product.price.lessThan(query.minPrice)) {
+      if (query.minPrice && product.price.isLessThan(query.minPrice)) {
         return false
       }
-      if (query.maxPrice && product.price.greaterThan(query.maxPrice)) {
+      if (query.maxPrice && product.price.isGreaterThan(query.maxPrice)) {
         return false
       }
       return true

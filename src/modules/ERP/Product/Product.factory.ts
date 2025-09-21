@@ -1,14 +1,15 @@
-import Decimal from 'decimal.js'
 import { Product, ProductProps } from './Product'
 import { PricingType } from 'src/utils/PricingType'
-import { MeasuringUnit } from 'src/utils/MeasuringUnit'
+import { MeasuringUnit } from 'src/modules/ERP/MeasuringUnit/MeasuringUnit'
+import { Barcode } from '../Barcode/Barcode'
+import { Money } from '../Money/Money'
 
 export const test_product: ProductProps = {
-  barcode: '7894900010015',
+  barcode: new Barcode('7894900010015'),
   name: 'Coca cola lata',
   description: '',
-  price: Decimal('3.99'),
-  measuringUnit: MeasuringUnit.unit('1'),
+  price: new Money('3.99'),
+  measure: MeasuringUnit.mililiter('350'),
   pricingType: PricingType.UNITARY,
 }
 
@@ -26,11 +27,11 @@ export const makeProductProps = (
   props: Partial<ProductProps>
 ): ProductProps => {
   return {
-    barcode: '7894900010015',
+    barcode: new Barcode('7894900010015'),
     name: 'Coca cola lata',
     description: '',
-    price: Decimal('3.99'),
-    measuringUnit: MeasuringUnit.unit('1'),
+    price: new Money('3.99'),
+    measure: MeasuringUnit.mililiter('300'),
     pricingType: PricingType.UNITARY,
     ...props,
   }

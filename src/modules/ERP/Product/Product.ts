@@ -1,32 +1,21 @@
-import { randomUUID } from 'crypto'
-import Decimal from 'decimal.js'
-import { MeasuringUnit } from 'src/utils/MeasuringUnit'
+import { Entity } from 'src/modules/entity'
+import { MeasuringUnit } from 'src/modules/ERP/MeasuringUnit/MeasuringUnit'
 import { PricingType } from 'src/utils/PricingType'
+import { Barcode } from '../Barcode/Barcode'
+import { Money } from '../Money/Money'
 
 export interface ProductProps {
-  barcode: string
   name: string
   description: string
-  price: Decimal
+  barcode: Barcode
+  price: Money
   pricingType: PricingType
-  measuringUnit: MeasuringUnit
+  measure: MeasuringUnit
 }
 
-export class Product {
-  private props: ProductProps
-  private _id: string
-
+export class Product extends Entity<ProductProps> {
   constructor(props: ProductProps, id?: string) {
-    this.props = props
-    this._id = id || randomUUID()
-  }
-
-  get id(): string {
-    return this._id
-  }
-
-  toProps(): ProductProps {
-    return { ...this.props }
+    super(props, id)
   }
 
   get name(): string {
@@ -37,16 +26,16 @@ export class Product {
     return this.props.description
   }
 
-  get barcode(): string {
+  get barcode(): Barcode {
     return this.props.barcode
   }
 
-  get price(): Decimal {
+  get price(): Money {
     return this.props.price
   }
 
-  get measuringUnit(): MeasuringUnit {
-    return this.props.measuringUnit
+  get measure(): MeasuringUnit {
+    return this.props.measure
   }
 
   get pricingType(): PricingType {

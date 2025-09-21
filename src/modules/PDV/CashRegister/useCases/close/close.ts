@@ -1,10 +1,10 @@
-import Decimal from 'decimal.js'
 import { CashRegisterRepository } from '../../repositories/CashRegister.repository'
+import { Money } from 'src/modules/ERP/Money/Money'
 
 export class Close {
   constructor(private cashRegisterRepository: CashRegisterRepository) {}
 
-  async execute(amount: Decimal, operatorId: string) {
+  async execute(amount: Money, operatorId: string) {
     const cashRegister =
       await this.cashRegisterRepository.findActiveRegister(operatorId)
 

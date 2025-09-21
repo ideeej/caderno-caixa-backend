@@ -1,9 +1,9 @@
 import { Entity } from 'src/modules/entity'
-import { Address } from 'src/utils/Address'
-import { CPF } from 'src/utils/CPF'
-import { Email } from 'src/utils/Email'
+import { Address } from 'src/modules/ERP/Address/Address'
+import { CPF } from 'src/modules/ERP/CPF/CPF'
+import { Email } from 'src/modules/ERP/Email/Email'
 import { ICustomer } from 'src/utils/ICustomer'
-import { PhoneNumber } from 'src/utils/PhoneNumber'
+import { PhoneNumber } from 'src/modules/ERP/PhoneNumber/PhoneNumber'
 
 export interface ClientProps {
   name: string

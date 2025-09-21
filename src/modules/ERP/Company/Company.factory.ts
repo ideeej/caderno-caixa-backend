@@ -1,8 +1,8 @@
 import { Company, CompanyProps } from './Company'
-import { CNPJ } from 'src/utils/CNPJ'
-import { Address } from 'src/utils/Address'
-import { Email } from 'src/utils/Email'
-import { PhoneNumber } from 'src/utils/PhoneNumber'
+import { CNPJ } from 'src/modules/ERP/CNPJ/CNPJ'
+import { Address } from 'src/modules/ERP/Address/Address'
+import { Email } from 'src/modules/ERP/Email/Email'
+import { PhoneNumber } from 'src/modules/ERP/PhoneNumber/PhoneNumber'
 
 export const CLIENT_ID = 'CLIENT_TEST_ID'
 

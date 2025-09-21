@@ -1,8 +1,8 @@
-import { Address } from 'src/utils/Address'
-import { Email } from 'src/utils/Email'
-import { PhoneNumber } from 'src/utils/PhoneNumber'
-import { CPF } from 'src/utils/CPF'
-import { CNPJ } from 'src/utils/CNPJ'
+import { Address } from 'src/modules/ERP/Address/Address'
+import { Email } from 'src/modules/ERP/Email/Email'
+import { PhoneNumber } from 'src/modules/ERP/PhoneNumber/PhoneNumber'
+import { CPF } from 'src/modules/ERP/CPF/CPF'
+import { CNPJ } from 'src/modules/ERP/CNPJ/CNPJ'
 
 export type CustomerDocument = CPF | CNPJ
 

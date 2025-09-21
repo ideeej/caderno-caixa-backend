@@ -1,11 +1,11 @@
-import Decimal from 'decimal.js'
 import { makeSale } from './Sale.factory'
 import { Sale, SaleState } from './Sale'
 import { makeProduct } from 'src/modules/ERP/Product/Product.factory'
 import { makeSaleItem } from './SaleItem.factory'
-import { Payment, PaymentType } from 'src/utils/Payment'
+import { Payment, PaymentType } from 'src/modules/ERP/Payment/Payment'
 import { makeClient } from 'src/modules/ERP/Client/Client.factory'
 import { makeCompany } from 'src/modules/ERP/Company/Company.factory'
+import { Money } from 'src/modules/ERP/Money/Money'
 
 describe('SALE TESTS', () => {
   let sale: Sale
@@ -16,14 +16,14 @@ describe('SALE TESTS', () => {
   test('SALE Test Creation with Client and Company', () => {
     expect(sale.items).toEqual([])
     expect(sale.state).toBe(SaleState.CREATED)
-    expect(sale.total).toEqual(Decimal('0'))
     expect(sale.closedAt).toBeNull()
     expect(sale.cancelledAt).toBeNull()
     expect(sale.finishedAt).toBeNull()
     expect(sale.customer).toBeNull()
     expect(sale.payments).toEqual([])
-    expect(sale.totalPaid).toEqual(Decimal('0'))
-    expect(sale.change).toEqual(Decimal('0'))
+    expect(sale.total.value.toString()).toBe('0')
+    expect(sale.totalPaid.value.toString()).toBe('0')
+    expect(sale.change.value.toString()).toBe('0')
     expect(sale.isFullyPaid).toBe(false)
 
     const testClient = makeClient({ name: 'Cliente teste' })
@@ -39,7 +39,7 @@ describe('SALE TESTS', () => {
 
   describe('Items', () => {
     test('AddItem should add an item to items and update total', () => {
-      const product = makeProduct({ price: Decimal('10.58') })
+      const product = makeProduct({ price: new Money('10.58') })
       const testItem = makeSaleItem({ productInfo: product })
 
       expect(sale.state).toBe(SaleState.CREATED)
@@ -47,78 +47,77 @@ describe('SALE TESTS', () => {
       expect(sale.state).toBe(SaleState.OPEN)
 
       expect(sale.items[0]).toEqual(testItem)
-      expect(sale.total).toEqual(Decimal('10.58'))
+      expect(sale.total.value.toString()).toBe('10.58')
     })
 
     test('RemoveByIndex should remove an item from items by index and update total', () => {
-      const produtoTest = makeProduct({ price: Decimal('10.58') })
+      const produtoTest = makeProduct({ price: new Money('10.58') })
       const testItem = makeSaleItem({ productInfo: produtoTest })
 
       sale.addItem(testItem)
-      expect(sale.total).toEqual(Decimal('10.58'))
+      expect(sale.total.value.toString()).toBe('10.58')
       sale.removeByIndex(0)
 
       expect(sale.items).toEqual([])
-      expect(sale.total).toEqual(Decimal('0'))
+      expect(sale.total.value.toString()).toBe('0')
     })
 
     test('RemoveById should remove an item from items by ID and update total', () => {
-      const produtoTeste = makeProduct({ price: Decimal('10.58') })
+      const produtoTeste = makeProduct({ price: new Money('10.58') })
       const testItem = makeSaleItem({ productInfo: produtoTeste })
 
       sale.addItem(testItem)
-      expect(sale.total).toEqual(Decimal('10.58'))
+      expect(sale.total.value.toString()).toBe('10.58')
       sale.removeById(testItem.id)
 
       expect(sale.items).toEqual([])
-      expect(sale.total).toEqual(Decimal('0'))
+      expect(sale.total.value.toString()).toBe('0')
     })
   })
 
   describe('Payments', () => {
     test('AddPayment should add a payment to payments and update paidAmount and change', () => {
-      const product = makeProduct({ price: Decimal('10.58') })
+      const product = makeProduct({ price: new Money('10.58') })
       const item = makeSaleItem({ productInfo: product })
-
       sale.open()
       sale.addItem(item)
-      expect(sale.total).toEqual(Decimal('10.58'))
-      expect(sale.totalPaid).toEqual(Decimal('0'))
-      expect(sale.change).toEqual(Decimal('0'))
+      expect(sale.total.value.toString()).toBe('10.58')
+      expect(sale.totalPaid.value.toString()).toBe('0')
+      expect(sale.change.value.toString()).toBe('0')
       expect(sale.isFullyPaid).toBe(false)
 
       const payment = new Payment({
-        amount: Decimal('20.00'),
+        amount: new Money('20.00'),
         type: PaymentType.CASH,
       })
 
       sale.close() // Accepting payments now
       sale.addPayment(payment)
       expect(sale.payments.length).toBe(1)
-      expect(sale.totalPaid).toEqual(Decimal('20.00'))
-      expect(sale.change).toEqual(Decimal('9.42'))
+      expect(sale.totalPaid.value.toString()).toBe('20')
+      expect(sale.change.value.toString()).toBe('9.42')
       expect(sale.isFullyPaid).toBe(true)
 
       sale.addPayment(
         new Payment({
-          amount: Decimal('10.00'),
+          amount: new Money('10.00'),
           type: PaymentType.CASH,
         })
       )
       expect(sale.payments.length).toBe(2)
-      expect(sale.totalPaid).toEqual(Decimal('30.00'))
-      expect(sale.change).toEqual(Decimal('19.42'))
+      expect(sale.totalPaid.value.toString()).toBe('30')
+      expect(sale.change.value.toString()).toBe('19.42')
       expect(sale.isFullyPaid).toBe(true)
     })
 
     test('RemovePayment should remove a payment from payments, update paidAmount and change', () => {
-      const product = makeProduct({ price: Decimal('10.58') })
+      const product = makeProduct({ price: new Money('10.58') })
       const item = makeSaleItem({ productInfo: product })
 
       sale.addItem(item)
 
       const payment = new Payment({
-        amount: Decimal('20.00'),
+        amount: new Money('20.00'),
         type: PaymentType.CASH,
       })
 
@@ -127,8 +126,8 @@ describe('SALE TESTS', () => {
       sale.removePayment(payment.id)
 
       expect(sale.payments.length).toBe(0)
-      expect(sale.totalPaid).toEqual(Decimal('0'))
-      expect(sale.change).toEqual(Decimal('0'))
+      expect(sale.totalPaid.value.toString()).toBe('0')
+      expect(sale.change.value.toString()).toBe('0')
       expect(sale.isFullyPaid).toBe(false)
     })
   })

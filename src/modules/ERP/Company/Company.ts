@@ -1,9 +1,9 @@
 import { Entity } from 'src/modules/entity'
-import { Address } from 'src/utils/Address'
-import { CNPJ } from 'src/utils/CNPJ'
-import { Email } from 'src/utils/Email'
+import { Address } from 'src/modules/ERP/Address/Address'
+import { CNPJ } from 'src/modules/ERP/CNPJ/CNPJ'
+import { Email } from 'src/modules/ERP/Email/Email'
 import { ICustomer, CustomerDocument } from 'src/utils/ICustomer'
-import { PhoneNumber } from 'src/utils/PhoneNumber'
+import { PhoneNumber } from 'src/modules/ERP/PhoneNumber/PhoneNumber'
 
 export interface CompanyProps {
   corporateName: string // Razão Social

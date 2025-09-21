@@ -5,13 +5,13 @@ export class ProductRepositoryFake implements ProductRepository {
   products: Map<string, Product> = new Map()
 
   async save(product: Product): Promise<Product> {
-    const hasProduct = this.products.get(product.barcode)
+    const hasProduct = this.products.get(product.id)
 
-    if (hasProduct) {
+    if (hasProduct && hasProduct.barcode === product.barcode) {
       throw new Error('Product already exists.')
     }
 
-    this.products.set(product.barcode, product)
+    this.products.set(product.id, product)
     return product
   }
 

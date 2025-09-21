@@ -1,4 +1,4 @@
-import Decimal from 'decimal.js'
+import { Money } from 'src/modules/ERP/Money/Money'
 import { CashRegister, CashRegisterState } from '../CashRegister'
 import { CashRegisterRepository } from './CashRegister.repository'
 
@@ -20,7 +20,7 @@ export class FakeCashRegisterRepository implements CashRegisterRepository {
     }
   }
 
-  async close(amount: Decimal, operatorId: string): Promise<void> {
+  async close(amount: Money, operatorId: string): Promise<void> {
     const cashRegister = await this.findActiveRegister(operatorId)
 
     if (cashRegister) {

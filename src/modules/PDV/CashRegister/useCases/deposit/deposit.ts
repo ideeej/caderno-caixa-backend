@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { CashRegisterRepository } from '../../repositories/CashRegister.repository'
-import { PaymentProps } from 'src/utils/Payment'
+import { PaymentProps } from 'src/modules/ERP/Payment/Payment'
 
 @Injectable()
 export class Deposit {

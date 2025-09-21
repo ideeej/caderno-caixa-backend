@@ -1,9 +1,9 @@
-import Decimal from 'decimal.js'
+import { Money } from 'src/modules/ERP/Money/Money'
 import { CashRegisterState } from '../../CashRegister'
 import { makeCashRegister } from '../../CashRegister.factory'
 import { FakeCashRegisterRepository } from '../../repositories/CashRegisterFake.repository'
 import { Deposit } from './deposit'
-import { PaymentType } from 'src/utils/Payment'
+import { PaymentType } from 'src/modules/ERP/Payment/Payment'
 
 let fakeCashRegisterRepository: FakeCashRegisterRepository
 let depositUsecase: Deposit
@@ -15,7 +15,7 @@ describe('CashRegister Deposit Usecase', () => {
   })
 
   it('Should deposit amount to the cashRegister', async () => {
-    const initialBalance = Decimal('100')
+    const initialBalance = new Money('100')
     const defaultOperatorId = 'default_operator_id'
 
     const cashRegister = makeCashRegister({
@@ -27,14 +27,14 @@ describe('CashRegister Deposit Usecase', () => {
     await fakeCashRegisterRepository.save(cashRegister)
 
     await depositUsecase.execute(
-      { amount: Decimal('50'), type: PaymentType.CASH },
+      { amount: new Money('50'), type: PaymentType.CASH },
       defaultOperatorId
     )
 
     const testRegister =
       await fakeCashRegisterRepository.findActiveRegister(defaultOperatorId)
     if (testRegister) {
-      expect(testRegister.balance.cash).toEqual(Decimal('150'))
+      expect(testRegister.balance.cash.value.toString()).toBe('150')
     }
   })
 })

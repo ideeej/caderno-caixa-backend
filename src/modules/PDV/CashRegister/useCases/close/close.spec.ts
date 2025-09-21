@@ -1,4 +1,4 @@
-import Decimal from 'decimal.js'
+import { Money } from 'src/modules/ERP/Money/Money'
 import { CashRegisterState } from '../../CashRegister'
 import { makeCashRegister } from '../../CashRegister.factory'
 import { FakeCashRegisterRepository } from '../../repositories/CashRegisterFake.repository'
@@ -14,8 +14,8 @@ describe('CashRegister Close Usecase', () => {
   })
 
   it('Should close the cashRegister for this operator id', async () => {
-    const initialBalance = Decimal('100')
-    const declaredCash = Decimal('150')
+    const initialBalance = new Money('100')
+    const declaredCash = new Money('150')
 
     const testOperatorId = 'test_operator_id'
     const cashRegister = makeCashRegister({
@@ -24,6 +24,7 @@ describe('CashRegister Close Usecase', () => {
       operatorId: testOperatorId,
     })
 
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fakeCashRegisterRepository.save(cashRegister)
 
     await closeUseCase.execute(declaredCash, testOperatorId)
