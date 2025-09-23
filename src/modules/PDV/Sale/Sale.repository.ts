@@ -1,6 +1,7 @@
+import { IRepository } from 'src/utils/IRepository'
 import { Sale } from './Sale'
 
-export abstract class SaleRepository {
+export abstract class SaleRepository implements IRepository<Sale> {
   abstract findById(id: string): Promise<Sale | null>
   abstract save(sale: Sale): Promise<void>
   abstract delete(id: string): Promise<void>
