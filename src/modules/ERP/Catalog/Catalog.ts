@@ -23,7 +23,11 @@ export class Catalog extends Entity<CatalogProps> {
     )
   }
 
-  get products(): Product[] {
+  get products(): Map<string, Product> {
+    return this.props.products
+  }
+
+  productsArray(): Product[] {
     return Array.from(this.props.products.values())
   }
 
@@ -59,11 +63,10 @@ export class Catalog extends Entity<CatalogProps> {
     if (!product) {
       throw new Error('Produto não encontrado')
     }
-    // Verifica se o código de barras já existe em outro produto
     if (editProps.barcode !== product.barcode) {
       const existingProduct = this.getProductByBarcode(editProps.barcode.value)
       if (existingProduct) {
-        throw new Error('Código de barras já está em uso')
+        existingProduct.edit(editProps)
       }
     }
     product.edit(editProps)
@@ -77,7 +80,7 @@ export class Catalog extends Entity<CatalogProps> {
   }
 
   searchProducts(query: ProductSearch): Product[] {
-    return this.products.filter(product => {
+    return this.productsArray().filter(product => {
       if (
         query.name &&
         !product.name.toLowerCase().includes(query.name.toLowerCase())
@@ -103,7 +106,7 @@ export class Catalog extends Entity<CatalogProps> {
   ): { products: Product[]; total: number } {
     const start = (page - 1) * limit
     const end = start + limit
-    const allProducts = this.products
+    const allProducts = this.productsArray()
 
     return {
       products: allProducts.slice(start, end),

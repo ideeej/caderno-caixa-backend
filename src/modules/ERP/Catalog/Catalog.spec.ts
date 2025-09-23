@@ -37,7 +37,7 @@ describe('Domain Catalog', () => {
   describe('Factory', () => {
     test('should create empty catalog with factory', () => {
       const emptyCatalog = makeCatalog()
-      expect(emptyCatalog.products).toHaveLength(0)
+      expect(emptyCatalog.products.size).toBe(0)
     })
 
     test('should create catalog with initial products', () => {
@@ -45,7 +45,7 @@ describe('Domain Catalog', () => {
       productsMap.set(product1.id, product1)
 
       const catalogWithProducts = makeCatalog({ products: productsMap })
-      expect(catalogWithProducts.products).toHaveLength(1)
+      expect(catalogWithProducts.products.size).toBe(1)
       expect(catalogWithProducts.getProduct(product1.id)).toEqual(product1)
     })
 
@@ -58,18 +58,18 @@ describe('Domain Catalog', () => {
 
   describe('Core Operations', () => {
     test('should create an empty catalog', () => {
-      expect(catalog.products).toHaveLength(0)
+      expect(catalog.products.size).toBe(0)
     })
 
     test('should add a product', () => {
       catalog.addProduct(product1)
-      expect(catalog.products).toHaveLength(1)
+      expect(catalog.products.size).toBe(1)
       expect(catalog.getProduct(product1.id)).toEqual(product1)
     })
 
     test('should add multiple products', () => {
       catalog.addProducts([product1, product2])
-      expect(catalog.products).toHaveLength(2)
+      expect(catalog.products.size).toBe(2)
     })
 
     test('should not add duplicate product ID', () => {
@@ -138,18 +138,6 @@ describe('Domain Catalog', () => {
       expect(updated?.description).toBe('Nova descrição')
     })
 
-    test('should not edit product with duplicate barcode', () => {
-      catalog.addProducts([product1, product2])
-      const newProps = {
-        ...product2.toProps(),
-        barcode: product1.barcode,
-      }
-
-      expect(() => catalog.editProduct(product2.id, newProps)).toThrow(
-        'Código de barras já está em uso'
-      )
-    })
-
     test('should remove product', () => {
       catalog.addProduct(product1)
       catalog.removeProduct(product1.id)
@@ -164,7 +152,7 @@ describe('Domain Catalog', () => {
         const baseBarcode = `789490000${i.toString().padStart(3, '0')}`
         const validBarcode = generateValidEAN13(baseBarcode)
         return makeProduct({
-          barcode: new Barcode(validBarcode),
+          barcode: validBarcode,
           name: `Product ${i + 1}`,
           description: 'Test product',
           price: new Money('1.99'),

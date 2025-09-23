@@ -1,4 +1,4 @@
-export function generateValidEAN13(prefix: string): string {
+export function generateValidEAN13(prefix: string = ''): Barcode {
   const code = prefix.padEnd(12, '0') // Garante que o prefixo tenha 12 dígitos
   let sum = 0
   for (let i = 0; i < 12; i++) {
@@ -6,7 +6,7 @@ export function generateValidEAN13(prefix: string): string {
     sum += i % 2 === 0 ? digit : digit * 3
   }
   const checkDigit = (10 - (sum % 10)) % 10
-  return code.slice(0, 12) + checkDigit.toString()
+  return new Barcode(code.slice(0, 12) + checkDigit.toString())
 }
 
 // Uma classe de valor para representar e validar códigos de barras.
