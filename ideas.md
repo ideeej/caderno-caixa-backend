@@ -62,7 +62,7 @@
 
 ### Venda → Estoque
 
-- [ ] Baixa automática no estoque
+- [x] Baixa automática no estoque ao fechar venda
 - [ ] Validação de disponibilidade
 - [ ] Estorno em cancelamento
 

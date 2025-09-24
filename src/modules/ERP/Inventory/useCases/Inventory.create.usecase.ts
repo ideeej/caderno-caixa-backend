@@ -5,8 +5,8 @@ import { InventoryRepository } from '../Inventory.repository'
 export class CreateInventoryUseCase {
   constructor(private inventoryRepository: InventoryRepository) {}
 
-  async execute(): Promise<Inventory | null> {
-    const inventory: Inventory = makeInventory({})
+  async execute(inventoryId?: string): Promise<Inventory | null> {
+    const inventory: Inventory = makeInventory({}, inventoryId)
 
     await this.inventoryRepository.save(inventory)
 

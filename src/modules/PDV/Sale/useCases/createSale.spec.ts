@@ -1,21 +1,36 @@
+import { CreateInventoryUseCase } from 'src/modules/ERP/Inventory/useCases/Inventory.create.usecase'
 import { Sale, SaleState } from '../Sale'
 import { FakeSaleRepository } from '../Sale.repository'
 import { CreateSaleUseCase } from './createSale.usecase'
+import { FakeInventoryRepository } from 'src/modules/ERP/Inventory/Inventory.repository'
+import { makeInventory } from 'src/modules/ERP/Inventory/Inventory.factory'
 
 describe('CreateSale Usecase', () => {
   let createSaleUseCase: CreateSaleUseCase
+  let createInventoryUseCase: CreateInventoryUseCase
   let fakeRepository: FakeSaleRepository
+  let fakeInventoryRepository: FakeInventoryRepository
 
   beforeEach(() => {
     fakeRepository = new FakeSaleRepository()
-    createSaleUseCase = new CreateSaleUseCase(fakeRepository)
+    fakeInventoryRepository = new FakeInventoryRepository()
+    createInventoryUseCase = new CreateInventoryUseCase(fakeInventoryRepository)
+
+    createSaleUseCase = new CreateSaleUseCase(
+      fakeRepository,
+      fakeInventoryRepository,
+      createInventoryUseCase
+    )
   })
 
   test('should create an empty sale and save it on the repository', async () => {
-    const sale: Sale = await createSaleUseCase.execute()
+    const inventory = await createInventoryUseCase.execute()
+
+    const sale: Sale = await createSaleUseCase.execute(inventory!.id)
 
     expect(sale.items).toEqual([])
     expect(sale.state).toBe(SaleState.CREATED)
+    expect(sale.inventory.id).toBe(inventory?.id)
     expect(sale.closedAt).toBeNull()
     expect(sale.cancelledAt).toBeNull()
     expect(sale.finishedAt).toBeNull()

@@ -1,8 +1,9 @@
-import { Barcode, generateValidEAN13 } from '../../Barcode/Barcode'
+import { makeSale } from 'src/modules/PDV/Sale/Sale.factory'
 import { Inventory } from '../Inventory'
 import { makeInventory } from '../Inventory.factory'
 import { FakeInventoryRepository } from '../Inventory.repository'
 import { SaleInventoryUseCase } from './Inventory.sale.usecase'
+import { makeProduct } from '../../Product/Product.factory'
 
 describe('Inventory Sale  Usecase', () => {
   let saleInventory: SaleInventoryUseCase
@@ -13,48 +14,53 @@ describe('Inventory Sale  Usecase', () => {
     saleInventory = new SaleInventoryUseCase(fakeRepository)
   })
 
-  test('should perform the sale of a product from the inventory', async () => {
+  test('should perform the sale and update the inventory', async () => {
     const inventory: Inventory | null = makeInventory({})
-    const productBarcode: Barcode = generateValidEAN13()
+    const sale = makeSale({})
+    const product = makeProduct({})
 
-    inventory.performEntry(productBarcode, 20)
+    sale.addItem(product, 5)
+
+    inventory.performEntry(product.barcode, 20)
 
     await fakeRepository.save(inventory)
 
     const updatedInventory: Inventory | null = await saleInventory.execute(
       inventory.id,
-      productBarcode,
-      15
+      sale
     )
 
-    const addedItem = updatedInventory?.findByBarcode(productBarcode)
+    const inventoryItem = updatedInventory?.findByBarcode(product.barcode)
+
     expect(updatedInventory?.items.size).toBe(1)
     expect(updatedInventory?.operations.length).toBe(2)
-    expect(addedItem).toBeDefined()
-    expect(addedItem?.productBarcode).toBe(productBarcode)
-    expect(addedItem?.quantity).toBe(5)
+    expect(inventoryItem).toBeDefined()
+    expect(inventoryItem?.productBarcode).toBe(product.barcode)
+    expect(inventoryItem?.quantity).toBe(15)
   })
 
   test('Should add items and not duplicate', async () => {
     const inventory: Inventory | null = makeInventory({})
-    const productBarcode: Barcode = generateValidEAN13()
+    const sale = makeSale({})
+    const product = makeProduct({})
 
-    inventory.performEntry(productBarcode, 30)
+    sale.addItem(product, 5)
+
+    inventory.performEntry(product.barcode, 30)
 
     await fakeRepository.save(inventory)
-    await saleInventory.execute(inventory.id, productBarcode, 5)
+    await saleInventory.execute(inventory.id, sale)
 
     const updatedInventory: Inventory | null = await saleInventory.execute(
       inventory.id,
-      productBarcode,
-      15
+      sale
     )
 
-    const addedItem = updatedInventory?.findByBarcode(productBarcode)
+    const inventoryItem = updatedInventory?.findByBarcode(product.barcode)
     expect(updatedInventory?.items.size).toBe(1)
     expect(updatedInventory?.operations.length).toBe(3)
-    expect(addedItem).toBeDefined()
-    expect(addedItem?.productBarcode).toBe(productBarcode)
-    expect(addedItem?.quantity).toBe(10)
+    expect(inventoryItem).toBeDefined()
+    expect(inventoryItem?.productBarcode).toBe(product.barcode)
+    expect(inventoryItem?.quantity).toBe(20)
   })
 })

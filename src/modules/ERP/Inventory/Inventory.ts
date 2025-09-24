@@ -3,6 +3,7 @@ import { InventoryItem } from './InventoryItem'
 import { InventoryOperation, OperationType } from './InventoryOperation'
 import { makeInventoryItem } from './InventoryItem.factory'
 import { Barcode } from '../Barcode/Barcode'
+import { Sale } from 'src/modules/PDV/Sale/Sale'
 
 export interface InventoryProps {
   items: Map<string, InventoryItem>
@@ -101,17 +102,19 @@ export class Inventory extends Entity<InventoryProps> {
     )
   }
 
-  performSale(productBarcode: Barcode, quantity: number) {
-    this.removeItem(productBarcode, quantity)
-    this.props.operations.push(
-      new InventoryOperation({
-        type: OperationType.SAIDA,
-        productId: productBarcode.value,
-        quantity,
-        date: new Date(),
-        description: 'Operação de saída (venda)',
-      })
-    )
+  performSale(sale: Sale) {
+    sale.items.forEach(item => {
+      this.removeItem(item.productInfo.barcode, item.quantity)
+      this.props.operations.push(
+        new InventoryOperation({
+          type: OperationType.SAIDA,
+          productId: item.productInfo.barcode.value,
+          quantity: item.quantity,
+          date: new Date(),
+          description: 'Operação de saída (venda)',
+        })
+      )
+    })
   }
 
   performConsume(productBarcode: Barcode, quantity: number) {

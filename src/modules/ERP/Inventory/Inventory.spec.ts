@@ -2,9 +2,6 @@ import { Inventory } from './Inventory'
 import { InventoryItem } from './InventoryItem'
 import { OperationType } from './InventoryOperation'
 import { Barcode, generateValidEAN13 } from '../Barcode/Barcode'
-import { Money } from '../Money/Money'
-import { MeasuringUnit } from 'src/modules/ERP/MeasuringUnit/MeasuringUnit'
-import { PricingType } from 'src/utils/PricingType'
 import { makeInventory } from './Inventory.factory'
 
 describe('Domain Inventory', () => {

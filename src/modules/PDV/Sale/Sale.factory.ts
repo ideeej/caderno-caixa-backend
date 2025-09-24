@@ -1,3 +1,4 @@
+import { makeInventory } from 'src/modules/ERP/Inventory/Inventory.factory'
 import { Sale, SaleProps, SaleState } from './Sale'
 
 export const NFID = 'NF_TEST_ID'
@@ -5,6 +6,7 @@ export const NFID = 'NF_TEST_ID'
 export const TEST_SALE = {
   items: [],
   payments: [],
+  inventory: makeInventory({}),
   state: SaleState.CREATED,
   openedAt: new Date(),
   client: null,

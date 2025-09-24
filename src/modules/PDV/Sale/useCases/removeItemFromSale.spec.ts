@@ -2,7 +2,6 @@ import { FakeSaleRepository } from '../Sale.repository'
 import { RemoveItemFromSaleUseCase } from './removeItemFromSale.usecase'
 import { Money } from 'src/modules/ERP/Money/Money'
 import { makeSale } from '../Sale.factory'
-import { makeSaleItem } from '../SaleItem.factory'
 import { makeProduct } from 'src/modules/ERP/Product/Product.factory'
 
 describe('RemoveItemFromSale Usecase', () => {
@@ -18,20 +17,18 @@ describe('RemoveItemFromSale Usecase', () => {
     const sale = makeSale({})
     const product = makeProduct({ price: new Money('3.99') })
     const product2 = makeProduct({ price: new Money('6.99') })
-    const saleItem = makeSaleItem({ productInfo: product.toProps() })
-    const saleItem2 = makeSaleItem({ productInfo: product2.toProps() })
 
-    sale.addItem(saleItem)
-    sale.addItem(saleItem2)
+    sale.addItem(product)
+    sale.addItem(product2)
+
     fakeRepository.sales = [sale]
 
-    const newSale = await removeItemFromSale.execute(saleItem.id, sale.id)
+    const newSale = await removeItemFromSale.execute(sale.id, product.barcode)
 
     expect(newSale.items.length).toBe(1)
-    expect(newSale.items[0]).toEqual(saleItem2)
-    expect(newSale.items[0].productInfo).toEqual(product2.toProps())
+    expect(newSale.items[0].productInfo.barcode).toEqual(product2.barcode)
 
-    const newSale2 = await removeItemFromSale.execute(saleItem2.id, sale.id)
+    const newSale2 = await removeItemFromSale.execute(sale.id, product2.barcode)
     expect(newSale2.items.length).toBe(0)
     expect(newSale.items).toEqual([])
   })

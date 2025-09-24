@@ -3,6 +3,10 @@ import { SaleItem } from './SaleItem'
 import { Payment } from 'src/modules/ERP/Payment/Payment'
 import { ICustomer } from 'src/utils/ICustomer'
 import { Money } from 'src/modules/ERP/Money/Money'
+import { Inventory } from 'src/modules/ERP/Inventory/Inventory'
+import { Product } from 'src/modules/ERP/Product/Product'
+import { makeSaleItem } from './SaleItem.factory'
+import { Barcode } from 'src/modules/ERP/Barcode/Barcode'
 
 export enum SaleState {
   CREATED = 'CREATED', // empty sale
@@ -17,6 +21,7 @@ export interface SaleProps {
   state: SaleState
   customer?: ICustomer | null
   payments: Payment[]
+  inventory: Inventory
   openedAt: Date
   closedAt: Date | null
   cancelledAt: Date | null
@@ -60,6 +65,10 @@ export class Sale extends Entity<SaleProps> {
     return this.props.payments
   }
 
+  get inventory(): Inventory {
+    return this.props.inventory
+  }
+
   get total(): Money {
     return this.props.items.reduce(
       (total, item) => total.add(item.total.value),
@@ -94,8 +103,8 @@ export class Sale extends Entity<SaleProps> {
     this.props.customer = customer
   }
 
-  addItem(item: SaleItem) {
-    if (item.quantity <= 0) {
+  addItem(product: Product, quantity: number = 1) {
+    if (quantity <= 0) {
       throw new Error('Quantidade deve ser maior que zero')
     }
 
@@ -109,7 +118,27 @@ export class Sale extends Entity<SaleProps> {
       )
     }
 
-    this.props.items.push(item)
+    this.props.items.forEach(item => {
+      if (item.productInfo.barcode === product.barcode) {
+        // product exists
+        item.addQuantity(quantity)
+        return
+      }
+    })
+    this.props.items.push(makeSaleItem({ productInfo: product, quantity }))
+  }
+
+  removeBarcode(barcode: Barcode) {
+    if (this.props.state !== SaleState.OPEN) {
+      throw new Error(
+        'Não é possível remover itens. A venda não está aberta para edição de itens.'
+      )
+    }
+
+    const indexToRemove = this.props.items.findIndex(
+      item => item.productInfo.barcode === barcode
+    )
+    return this.props.items.splice(indexToRemove, 1)
   }
 
   removeByIndex(index: number): SaleItem[] {

@@ -26,6 +26,14 @@ export class SaleItem extends Entity<SaleItemProps> {
     return this.updateTotal()
   }
 
+  addQuantity(quantity: number) {
+    this.props.quantity += quantity
+  }
+
+  decreaseQuantity(quantity: number) {
+    this.props.quantity -= quantity
+  }
+
   updateTotal(): Money {
     return this.props.productInfo.price.multiply(this.props.quantity)
   }

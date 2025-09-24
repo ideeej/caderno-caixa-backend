@@ -40,21 +40,19 @@ describe('SALE TESTS', () => {
   describe('Items', () => {
     test('AddItem should add an item to items and update total', () => {
       const product = makeProduct({ price: new Money('10.58') })
-      const testItem = makeSaleItem({ productInfo: product })
 
       expect(sale.state).toBe(SaleState.CREATED)
-      sale.addItem(testItem)
+      sale.addItem(product)
       expect(sale.state).toBe(SaleState.OPEN)
 
-      expect(sale.items[0]).toEqual(testItem)
+      expect(sale.items[0].productInfo.barcode).toEqual(product.barcode)
       expect(sale.total.value.toString()).toBe('10.58')
     })
 
     test('RemoveByIndex should remove an item from items by index and update total', () => {
       const produtoTest = makeProduct({ price: new Money('10.58') })
-      const testItem = makeSaleItem({ productInfo: produtoTest })
 
-      sale.addItem(testItem)
+      sale.addItem(produtoTest)
       expect(sale.total.value.toString()).toBe('10.58')
       sale.removeByIndex(0)
 
@@ -64,11 +62,10 @@ describe('SALE TESTS', () => {
 
     test('RemoveById should remove an item from items by ID and update total', () => {
       const produtoTeste = makeProduct({ price: new Money('10.58') })
-      const testItem = makeSaleItem({ productInfo: produtoTeste })
 
-      sale.addItem(testItem)
+      sale.addItem(produtoTeste)
       expect(sale.total.value.toString()).toBe('10.58')
-      sale.removeById(testItem.id)
+      sale.removeById(produtoTeste.id)
 
       expect(sale.items).toEqual([])
       expect(sale.total.value.toString()).toBe('0')
@@ -78,9 +75,9 @@ describe('SALE TESTS', () => {
   describe('Payments', () => {
     test('AddPayment should add a payment to payments and update paidAmount and change', () => {
       const product = makeProduct({ price: new Money('10.58') })
-      const item = makeSaleItem({ productInfo: product })
+
       sale.open()
-      sale.addItem(item)
+      sale.addItem(product)
       expect(sale.total.value.toString()).toBe('10.58')
       expect(sale.totalPaid.value.toString()).toBe('0')
       expect(sale.change.value.toString()).toBe('0')
@@ -112,9 +109,8 @@ describe('SALE TESTS', () => {
 
     test('RemovePayment should remove a payment from payments, update paidAmount and change', () => {
       const product = makeProduct({ price: new Money('10.58') })
-      const item = makeSaleItem({ productInfo: product })
 
-      sale.addItem(item)
+      sale.addItem(product)
 
       const payment = new Payment({
         amount: new Money('20.00'),
@@ -139,13 +135,12 @@ describe('SALE TESTS', () => {
     })
     test('Close should change the state accordingly', () => {
       const product = makeProduct({})
-      const item = makeSaleItem({ productInfo: product })
 
       expect(() => {
         sale.close()
       }).toThrow()
       sale.open()
-      sale.addItem(item)
+      sale.addItem(product)
       sale.close()
 
       expect(sale.state).toBe(SaleState.CLOSED)
@@ -160,10 +155,9 @@ describe('SALE TESTS', () => {
     })
     test('Cancel Closed sale', () => {
       const product = makeProduct({})
-      const item = makeSaleItem({ productInfo: product })
 
       sale.open()
-      sale.addItem(item)
+      sale.addItem(product)
       sale.close()
       sale.cancel()
       expect(sale.state).toBe(SaleState.CANCELLED)
