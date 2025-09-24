@@ -1,91 +1,129 @@
-import { InventoryItem } from './InventoryItem'
 import { Entity } from 'src/modules/entity'
+import { InventoryItem } from './InventoryItem'
 import { InventoryOperation, OperationType } from './InventoryOperation'
+import { makeInventoryItem } from './InventoryItem.factory'
+import { Barcode } from '../Barcode/Barcode'
 
 export interface InventoryProps {
   items: Map<string, InventoryItem>
-  operationHistory: InventoryOperation[]
+  barcodeIndex: Map<string, string>
+  allowNegativeStock?: boolean
+  operations: InventoryOperation[]
 }
 
 export class Inventory extends Entity<InventoryProps> {
-  allowNegativeStock = true // Para testes
-
   constructor(props: InventoryProps, id?: string) {
     super(props, id)
-  }
-
-  get operationHistory(): InventoryOperation[] {
-    return this.props.operationHistory
   }
 
   get items(): Map<string, InventoryItem> {
     return this.props.items
   }
 
-  getItemById(productId: string): InventoryItem | null {
-    return this.props.items.get(productId) ?? null
+  get operations(): InventoryOperation[] {
+    return this.props.operations
   }
 
-  addItems(inventoryItem: InventoryItem) {
-    const existingItem: InventoryItem | null = this.getItemById(
-      inventoryItem.productId
-    )
+  get barcodeIndex(): Map<string, string> {
+    return this.props.barcodeIndex
+  }
 
-    let updatedQuantity = inventoryItem.quantity
+  findByBarcode(barcode: Barcode): InventoryItem | null {
+    const itemId = this.props.barcodeIndex.get(barcode.value)
+    if (!itemId) {
+      return null
+    }
+    return this.props.items.get(itemId) ?? null
+  }
 
-    if (updatedQuantity <= 0) {
-      throw new Error('A quantidade a ser adicionada deve ser maior que zero.')
+  addItem(productBarcode: Barcode, quantity: number = 1) {
+    const existingItemId = this.props.barcodeIndex.get(productBarcode.value)
+
+    if (!existingItemId) {
+      const inventoryItem = makeInventoryItem({ productBarcode, quantity })
+      this.props.items.set(inventoryItem.id, inventoryItem)
+      this.props.barcodeIndex.set(productBarcode.value, inventoryItem.id)
+      return
     }
 
+    const existingItem = this.props.items.get(existingItemId)
     if (existingItem) {
-      updatedQuantity += existingItem.quantity
+      existingItem.addQuantity(quantity)
     }
-
-    const operation = new InventoryOperation({
-      type: OperationType.ENTRADA,
-      productId: inventoryItem.productId,
-      quantity: inventoryItem.quantity,
-      date: new Date(),
-    })
-
-    this.props.operationHistory.push(operation)
-
-    const newItem = new InventoryItem({
-      productId: inventoryItem.productId,
-      product: inventoryItem.product,
-      quantity: updatedQuantity,
-    })
-
-    this.props.items.set(inventoryItem.productId, newItem)
   }
 
-  removeItems(productId: string, quantity: number, type?: OperationType) {
-    const existingItem: InventoryItem | null = this.getItemById(productId)
+  removeItem(barcode: Barcode, quantity: number = 1) {
+    const itemId = this.props.barcodeIndex.get(barcode.value)
+    if (!itemId) {
+      throw new Error('Could not remove Item, no product with barcode found.')
+    }
 
+    const existingItem = this.props.items.get(itemId)
     if (!existingItem) {
-      throw new Error('Item não foi encontrado no inventário.')
+      throw new Error('Internal Error: Indexed item not found.')
     }
 
-    if (!this.allowNegativeStock && existingItem.quantity < quantity) {
-      throw new Error('Não temos produto suficiente em estoque.')
+    if (
+      existingItem.quantity - quantity < 0 &&
+      !this.props.allowNegativeStock
+    ) {
+      throw new Error(
+        'Estoque negativo não permitido. Não há estoque suficiente'
+      )
+    }
+    existingItem.removeQuantity(quantity)
+
+    if (existingItem.quantity <= 0) {
+      this.deleteItem(barcode)
+    }
+  }
+
+  deleteItem(barcode: Barcode) {
+    const itemId = this.props.barcodeIndex.get(barcode.value)
+    if (!itemId) {
+      return
     }
 
-    existingItem.quantity -= quantity
+    this.props.barcodeIndex.delete(barcode.value)
+    this.props.items.delete(itemId)
+  }
 
-    const operation = new InventoryOperation({
-      type: type || OperationType.SAIDA,
-      productId: productId,
-      quantity: quantity,
-      date: new Date(),
-    })
+  performEntry(productBarcode: Barcode, quantity: number) {
+    this.addItem(productBarcode, quantity)
+    this.props.operations.push(
+      new InventoryOperation({
+        type: OperationType.ENTRADA,
+        productId: productBarcode.value,
+        quantity,
+        date: new Date(),
+        description: 'Operação de entrada (compra)',
+      })
+    )
+  }
 
-    this.props.operationHistory.push(operation)
+  performSale(productBarcode: Barcode, quantity: number) {
+    this.removeItem(productBarcode, quantity)
+    this.props.operations.push(
+      new InventoryOperation({
+        type: OperationType.SAIDA,
+        productId: productBarcode.value,
+        quantity,
+        date: new Date(),
+        description: 'Operação de saída (venda)',
+      })
+    )
+  }
 
-    const itemToUpdate = new InventoryItem({
-      productId: existingItem.productId,
-      product: existingItem.product,
-      quantity: existingItem.quantity,
-    })
-    return this.props.items.set(productId, itemToUpdate)
+  performConsume(productBarcode: Barcode, quantity: number) {
+    this.removeItem(productBarcode, quantity)
+    this.props.operations.push(
+      new InventoryOperation({
+        type: OperationType.CONSUMO,
+        productId: productBarcode.value,
+        quantity,
+        date: new Date(),
+        description: 'Operação de consumo',
+      })
+    )
   }
 }

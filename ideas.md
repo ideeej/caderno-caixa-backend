@@ -1,57 +1,6 @@
 # Caderno Caixa - Controle de Progresso
 
-## 🔧 Value Objects (src/utils)
-
-### CPF
-
-- [x] Validação de CPF
-- [x] Formatação automática
-- [ ] Testes unitários
-
-### CNPJ
-
-- [x] Validação de CNPJ
-- [x] Formatação automática
-- [ ] Testes unitários
-
-### Email
-
-- [x] Validação de email
-- [x] Normalização (trim, lowercase)
-- [ ] Testes unitários
-
-### PhoneNumber
-
-- [x] Validação de telefone
-- [x] Formatação padrão
-- [ ] Testes unitários
-
-### Address
-
-- [x] Estrutura completa de endereço
-- [x] Validações básicas
-- [ ] Testes unitários
-
-### Payment
-
-- [x] Tipos de pagamento definidos
-- [x] Estrutura básica
-- [x] Integração com Sale
-- [ ] Testes unitários
-
 ## 📦 ERP (src/modules/ERP)
-
-### Product
-
-- [x] Estrutura básica
-- [x] Factory implementado
-- [x] Refatorar Product para usar as classes Money e Barcode
-- [ ] Testes unitários
-- [ ] Use Cases
-- [ ] Registrar um produto
-- [ ] criar testes para o caso de uso RegisterProduct
-- [ ] Verificar unicidade do código de barras no usecase
-- [ ] Repository
 
 ### Catalog
 
@@ -59,8 +8,11 @@
 - [x] CRUD produtos
 - [x] Factory implementado
 - [x] Testes implementados
-- [ ] Repository
-- [ ] Use Cases
+- [x] Repository
+- [x] Create Catalog
+- [x] Add Product to Catalog
+- [x] Remove Product from Catalog
+- [x] Edit Catalog product
 
 ### Inventory
 
@@ -68,42 +20,15 @@
 - [x] Movimentações (Entrada/Saída)
 - [x] Factory implementado
 - [x] Testes implementados
-- [ ] Repository
-- [ ] Use Cases
-
-### Operator
-
-- [x] Estrutura básica
-- [x] Factory implementado
-- [ ] Factory para testes
-- [ ] Testes unitários
-
-### Client
-
-- [x] Estrutura básica
-- [x] Validações (CPF, Email, Phone)
-- [ ] Factory para testes
-- [ ] Testes unitários
-- [ ] Repository
-- [ ] Use Cases
-
-### Company
-
-- [x] Estrutura básica
-- [x] Validações (CNPJ, Email, Phone)
-- [ ] Factory para testes
-- [ ] Testes unitários
-- [ ] Repository
-- [ ] Use Cases
-
-### Supplier
-
-- [x] Estrutura básica
-- [x] Validações (CNPJ, Email, Phone)
-- [ ] Factory para testes
-- [ ] Testes unitários
-- [ ] Repository
-- [ ] Use Cases
+- [x] Repository
+- [x] Create Inventory
+- [x] Inventory entry operation
+- [x] Inventory sale operation
+- [x] Inventory consume operation
+- [x] Inventory update operation
+- [x] Inventory delete opertion
+- [x] Reescrever Inventory
+- [x] Testar tudo (básico)
 
 ## 💰 PDV (src/modules/PDV)
 
@@ -129,8 +54,9 @@
 - [x] Customer vinculado à venda (Client ou Company ou null)
 - [ ] Desconto por item
 - [ ] Desconto total
-- [ ] Repository
-- [ ] Use Cases
+- [x] Repository
+- [x] Use Cases
+- [ ] Usecases: Associar um ICustomer, Operator, CashRegister
 
 ## 🔄 Integrações Pendentes
 
@@ -170,3 +96,68 @@
 - [ ] Schemas para novas entidades
 - [ ] Mappers para novas entidades
 - [WIP] Repositories para novas entidades
+
+## 🔧 Value Objects (src/utils)
+
+### CPF
+
+- [x] Validação de CPF
+- [x] Formatação automática
+- [ ] Testes unitários
+
+### CNPJ
+
+- [x] Validação de CNPJ
+- [x] Formatação automática
+- [ ] Testes unitários
+
+### Email
+
+- [x] Validação de email
+- [x] Normalização (trim, lowercase)
+- [ ] Testes unitários
+
+### PhoneNumber
+
+- [x] Validação de telefone
+- [x] Formatação padrão
+- [ ] Testes unitários
+
+### Address
+
+- [x] Estrutura completa de endereço
+- [x] Validações básicas
+- [ ] Testes unitários
+
+### Payment
+
+- [x] Tipos de pagamento definidos
+- [x] Estrutura básica
+- [x] Integração com Sale
+- [ ] Testes unitários
+
+### Product
+
+- [x] Estrutura básica
+- [x] Factory implementado
+- [x] Refatorar Product para usar as classes Money e Barcode
+
+### Operator
+
+- [x] Estrutura básica
+- [x] Factory implementado
+
+### Client
+
+- [x] Estrutura básica
+- [x] Validações (CPF, Email, Phone)
+
+### Company
+
+- [x] Estrutura básica
+- [x] Validações (CNPJ, Email, Phone)
+
+### Supplier
+
+- [x] Estrutura básica
+- [x] Validações (CNPJ, Email, Phone)

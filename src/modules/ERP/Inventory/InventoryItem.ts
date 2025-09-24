@@ -1,46 +1,36 @@
-import { randomUUID } from 'node:crypto'
-import { ProductProps } from '../Product/Product'
+import { Entity } from 'src/modules/entity'
+import { Barcode } from '../Barcode/Barcode'
 
 export interface InventoryItemProps {
-  productId: string
-  product: ProductProps
+  productBarcode: Barcode
   quantity: number
 }
 
-export class InventoryItem {
-  private props: InventoryItemProps
-  private _id: string
-
+export class InventoryItem extends Entity<InventoryItemProps> {
   constructor(props: InventoryItemProps, id?: string) {
-    this.props = { ...props }
-    this._id = id ?? randomUUID()
+    super(props, id)
   }
 
-  get id(): string {
-    return this._id
-  }
-
-  get productId(): string {
-    return this.props.productId
-  }
-
-  get product(): ProductProps {
-    return this.props.product
-  }
-
-  set product(prod: ProductProps) {
-    this.props.product = prod
+  get productBarcode(): Barcode {
+    return this.props.productBarcode
   }
 
   get quantity(): number {
     return this.props.quantity
   }
 
-  set quantity(qtd: number) {
-    this.props.quantity = qtd
+  addQuantity(quantity: number) {
+    this.props.quantity += quantity
+    this.updateTimestamp()
   }
 
-  edit({ productId, product, quantity }: InventoryItemProps) {
-    this.props = { productId, product, quantity }
+  removeQuantity(quantity: number) {
+    this.props.quantity -= quantity
+    this.updateTimestamp()
+  }
+
+  updateProduct(product: Barcode) {
+    this.props.productBarcode = product
+    this.updateTimestamp()
   }
 }

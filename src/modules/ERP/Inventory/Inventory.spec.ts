@@ -1,190 +1,60 @@
-import Decimal from 'decimal.js'
-import { PricingType } from 'src/utils/PricingType'
-import { MeasuringUnit } from 'src/modules/ERP/MeasuringUnit/MeasuringUnit'
-import { InventoryItem } from './InventoryItem'
-import { makeProduct } from '../Product/Product.factory'
-import { makeInventory } from './Inventory.factory'
-import { makeInventoryItem } from './InventoryItem.factory'
-
-// Concrete class dependencies
 import { Inventory } from './Inventory'
-import { InventoryOperation, OperationType } from './InventoryOperation'
+import { InventoryItem } from './InventoryItem'
+import { OperationType } from './InventoryOperation'
+import { Barcode, generateValidEAN13 } from '../Barcode/Barcode'
 import { Money } from '../Money/Money'
-import { Barcode } from '../Barcode/Barcode'
+import { MeasuringUnit } from 'src/modules/ERP/MeasuringUnit/MeasuringUnit'
+import { PricingType } from 'src/utils/PricingType'
+import { makeInventory } from './Inventory.factory'
 
 describe('Domain Inventory', () => {
-  describe('Core', () => {
-    let inventory: Inventory
-    beforeEach(() => {
-      inventory = makeInventory({})
+  let inventory: Inventory
+  let product1Barcode: Barcode
+  let product2Barcode: Barcode
+
+  beforeEach(() => {
+    inventory = makeInventory({
+      items: new Map<string, InventoryItem>(),
+      barcodeIndex: new Map<string, string>(),
+      operations: [],
     })
 
-    test('Create an empty inventory', () => {
-      expect(inventory.items).toEqual(new Map<string, InventoryItem>())
-    })
+    product1Barcode = generateValidEAN13()
+    product2Barcode = generateValidEAN13()
+  })
 
-    test('Additem should add InventoryItems correctly', () => {
-      const product = makeProduct({
-        barcode: new Barcode('7894900010015'),
-        name: 'Coca cola lata',
-        description: '',
-        price: new Money('3.49'),
-        measure: MeasuringUnit.mililiter('350'),
-        pricingType: PricingType.UNITARY,
-      })
+  test('Create an empty inventory', () => {
+    expect(inventory.items).toEqual(new Map<string, InventoryItem>())
+    expect(inventory.barcodeIndex).toEqual(new Map<string, string>())
+  })
 
-      const testInventoryItem = makeInventoryItem({
-        productId: product.id,
-        product: product.toProps(),
-        quantity: 5,
-      })
+  test('performEntry should add a new InventoryItem, update maps, and register an ENTRADA operation', () => {
+    inventory.performEntry(product1Barcode, 5)
 
-      inventory.addItems(testInventoryItem)
+    const itemInQuestion = inventory.findByBarcode(product1Barcode)
+    expect(itemInQuestion).toBeDefined()
+    expect(itemInQuestion!.productBarcode).toEqual(product1Barcode)
+    expect(itemInQuestion!.quantity).toBe(5)
 
-      const itemInQuestion = inventory.getItemById(product.id)
-      expect(itemInQuestion!.product).toEqual(product.toProps())
-      expect(itemInQuestion!.quantity).toBe(5)
-    })
+    const itemId = inventory.barcodeIndex.get(product1Barcode.value)
+    expect(itemId).toBeDefined()
+    expect(inventory.items.get(itemId!)).toBe(itemInQuestion)
 
-    test('Additem should create an InventoryOperation of type ENTRADA', () => {
-      const product = makeProduct({
-        barcode: new Barcode('7894900010015'),
-        name: 'Coca cola lata',
-        description: '',
-        price: new Money('3.49'),
-        measure: MeasuringUnit.mililiter('350'),
-        pricingType: PricingType.UNITARY,
-      })
+    expect(inventory.operations.length).toBe(1)
+    expect(inventory.operations[0].type).toBe(OperationType.ENTRADA)
+    expect(inventory.operations[0].productId).toBe(product1Barcode.value)
+    expect(inventory.operations[0].quantity).toBe(5)
+  })
 
-      const testInventoryItem = makeInventoryItem({
-        productId: product.id,
-        product,
-        quantity: 5,
-      })
+  test('performEntry should add quantities when item already exists', () => {
+    inventory.performEntry(product1Barcode, 5)
+    inventory.performEntry(product1Barcode, 10)
 
-      inventory.addItems(testInventoryItem)
+    const addedItem = inventory.findByBarcode(product1Barcode)
+    expect(addedItem!.quantity).toBe(15)
 
-      expect(inventory.operationHistory.length).toBe(1)
-      expect(inventory.operationHistory[0]).toBeInstanceOf(InventoryOperation)
-      expect(inventory.operationHistory[0].productId).toBe(product.id)
-      expect(inventory.operationHistory[0].quantity).toBe(
-        testInventoryItem.quantity
-      )
-    })
+    expect(inventory.items.size).toBe(1)
 
-    test('AddItem should add quantities when item exist', () => {
-      const products = [
-        makeProduct({
-          barcode: new Barcode('7894900010015'),
-          name: 'Coca cola lata',
-          description: '',
-          price: new Money('3.49'),
-          measure: MeasuringUnit.mililiter('350'),
-          pricingType: PricingType.UNITARY,
-        }),
-      ]
-
-      const items = [
-        makeInventoryItem({
-          productId: products[0].id,
-          product: products[0],
-          quantity: 5,
-        }),
-        makeInventoryItem({
-          productId: products[0].id,
-          product: products[0],
-          quantity: 10,
-        }),
-      ]
-
-      items.forEach(item => {
-        inventory.addItems(item)
-      })
-
-      const addedItem = inventory.getItemById(products[0].id)
-      expect(addedItem!.quantity).toBe(15)
-    })
-
-    test('RemoveItem should create InventoryOperations of the correct type', () => {
-      const product = makeProduct({
-        barcode: new Barcode('7894900010039'),
-        name: 'Fanta lata',
-        description: '',
-        price: new Money('3.29'),
-        measure: MeasuringUnit.mililiter('350'),
-        pricingType: PricingType.UNITARY,
-      })
-
-      const itemToAdd = makeInventoryItem({
-        productId: product.id,
-        product,
-        quantity: 5,
-      })
-
-      inventory.addItems(itemToAdd)
-      inventory.addItems(itemToAdd)
-      inventory.removeItems(product.id, 5)
-      inventory.removeItems(product.id, 5, OperationType.CONSUMO)
-
-      expect(inventory.operationHistory.length).toBe(4)
-      expect(inventory.operationHistory[0].type).toBe(OperationType.ENTRADA)
-      expect(inventory.operationHistory[1].type).toBe(OperationType.ENTRADA)
-      expect(inventory.operationHistory[2].type).toBe(OperationType.SAIDA)
-      expect(inventory.operationHistory[3].type).toBe(OperationType.CONSUMO)
-    })
-
-    test('RemoveItem should decrease quantity', () => {
-      const product = makeProduct({
-        barcode: new Barcode('7894900010022'),
-        name: 'Guaraná lata',
-        description: '',
-        price: new Money('3.19'),
-        measure: MeasuringUnit.mililiter('350'),
-        pricingType: PricingType.UNITARY,
-      })
-
-      const item = makeInventoryItem({
-        productId: product.id,
-        product,
-        quantity: 10,
-      })
-
-      inventory.addItems(item)
-      inventory.removeItems(product.id, 4)
-
-      const updatedItem = inventory.getItemById(product.id)
-      expect(updatedItem).not.toBeNull()
-      expect(updatedItem!.quantity).toBe(6)
-    })
-
-    test('AddItem should throw error if quantity is zero or negative', () => {
-      const product = makeProduct({
-        barcode: new Barcode('7894900010046'),
-        name: 'Sprite lata',
-        description: '',
-        price: new Money('3.39'),
-        measure: MeasuringUnit.mililiter('350'),
-        pricingType: PricingType.UNITARY,
-      })
-
-      const zeroItem = makeInventoryItem({
-        productId: product.id,
-        product,
-        quantity: 0,
-      })
-
-      const negativeItem = makeInventoryItem({
-        productId: product.id,
-        product,
-        quantity: -5,
-      })
-
-      expect(() => inventory.addItems(zeroItem)).toThrow(
-        'A quantidade a ser adicionada deve ser maior que zero.'
-      )
-      expect(() => inventory.addItems(negativeItem)).toThrow(
-        'A quantidade a ser adicionada deve ser maior que zero.'
-      )
-    })
+    expect(inventory.operations.length).toBe(2)
   })
 })

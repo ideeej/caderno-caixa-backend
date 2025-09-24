@@ -15,20 +15,13 @@ const cocaLata: Product = makeProduct({
   pricingType: PricingType.UNITARY,
 })
 
-export const makeInventoryItem = (
-  props: Partial<InventoryItemProps>,
-  id?: string
-) => {
-  if (!props.product) {
+export const makeInventoryItem = (props: Partial<InventoryItemProps>) => {
+  if (!props.productBarcode) {
     throw new Error('Failed to Make inventory item')
   }
 
-  return new InventoryItem(
-    {
-      productId: props.productId ?? cocaLata.id,
-      product: props.product ?? cocaLata.toProps(),
-      quantity: props.quantity ?? 1,
-    },
-    id
-  )
+  return new InventoryItem({
+    productBarcode: props.productBarcode ?? cocaLata.barcode,
+    quantity: props.quantity ?? 1,
+  })
 }

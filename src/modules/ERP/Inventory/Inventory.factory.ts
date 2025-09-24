@@ -4,9 +4,10 @@ import { InventoryItem } from './InventoryItem'
 export const makeInventory = (props: Partial<InventoryProps>, id?: string) => {
   return new Inventory(
     {
-      ...props,
       items: new Map<string, InventoryItem>(),
-      operationHistory: [],
+      barcodeIndex: new Map<string, string>(),
+      operations: [],
+      ...props,
     },
     id
   )
