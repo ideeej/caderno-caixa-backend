@@ -37,7 +37,7 @@ Recomendamos usar o Docker para configurar o ambiente e o banco de dados rapidam
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://www.youtube.com/watch?v=X49Wz3icO3E](https://www.youtube.com/watch?v=X49Wz3icO3E)
+    git clone https://github.com/ideeej/caderno-caixa-backend.git
     cd caderno-caixa-backend
     ```
 
